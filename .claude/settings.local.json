@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(meteor-addon)",
+      "Bash(mkdir:*)",
+      "Bash(git clone:*)",
+      "Bash(python .claude/skills/meteor-addon/scripts/filter_addons.py:*)",
+      "mcp__code-search-mcp__cache_stats",
+      "mcp__code-search-mcp__detect_stacks",
+      "mcp__code-search-mcp__search_files",
+      "Bash(mv:*)",
+      "Bash(git check-ignore:*)"
+    ]
+  }
+}
