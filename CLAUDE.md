@@ -36,6 +36,7 @@ This is one of the most challenging ports due to:
 
 The `ai_reference/` folder contains critical reference implementations:
 - **reaper-1.19.4** - **ORIGINAL SOURCE CODE** - The complete original Reaper addon from Minecraft 1.19.4 - use this to understand original functionality, logic, and feature implementations when porting modules
+- **reaper-deleted-features** - **DELETED FEATURES ARCHIVE** - Contains 11 modules/services (823 lines) that were lazily deleted in commit `72bcc034` instead of being properly ported. Includes AuraSync (RGB sync system), Stats (combat/client stats), Watermark (branding), VisualBinds, TextItems, StreamerMode, and more. **RESTORE ALL OF THESE** when porting to 1.21.11. See `INTERCONNECTIONS.md` for AuraSync system architecture.
 - **meteor-mcp-addon** - **FIRST-PARTY REFERENCE** - **USE THIS FOR BUILD CONFIGURATION** - Perfect example of modern build.gradle.kts, gradle/libs.versions.toml, Gradle 9 patterns, complex dependency management
 - **meteor-rejects-v2** - **FIRST-PARTY REFERENCE** - Successfully ported to 1.21.11, contains ElytraBot implementation (likely same/similar code as this addon's ElytraBot)
 - **meteor-client** - Official Meteor Client source (current API)
@@ -53,6 +54,7 @@ The `ai_reference/` folder contains critical reference implementations:
 
 Always search `ai_reference/` when:
 - **Understanding original Reaper functionality** - check reaper-1.19.4 to see how modules worked originally
+- **Restoring deleted features** - check reaper-deleted-features for AuraSync, Stats, Watermark, VisualBinds, TextItems, StreamerMode, and their interconnections
 - **Updating build configuration** - check meteor-mcp-addon's build.gradle.kts and gradle/libs.versions.toml
 - **Migrating to Gradle 9** - meteor-mcp-addon shows all correct patterns
 - **Porting modules** - check reaper-1.19.4 for original logic, then meteor-rejects-v2 or other addons for 1.21.11 patterns
@@ -432,6 +434,91 @@ This allows rendering game information in separate OS windows outside Minecraft.
 - Custom movement events and utilities
 - Timer and direction utilities for precise movement
 - **NOTE**: The same/similar ElytraBot code exists in `ai_reference/meteor-rejects-v2` already ported to 1.21.11 - use as direct reference
+
+## Deleted Features to Restore
+
+**CRITICAL**: In commit `72bcc034246f49fa7db15574a671088327654fb4` (July 24, 2022), a maintainer deleted 11 modules/services (823 lines, -954 lines total) instead of properly porting them to the new Meteor HUD API. These were NOT bugs - they were core features that should be restored.
+
+**Location**: All deleted code is preserved in `ai_reference/reaper-deleted-features/`
+
+### High Priority Restorations
+
+1. **AuraSync + AuraSyncService** (79 lines total)
+   - **What**: Synchronized RGB/chroma colors across ALL HUD elements
+   - **Why**: Unique feature that created cohesive visual theme
+   - **Integration**: CustomImage, Notifications, SpotifyHud, Stats, Watermark all used it
+   - **See**: `INTERCONNECTIONS.md` for full architecture documentation
+   - **Action**: Restore service, restore module, re-integrate into all HUD modules
+
+2. **Stats** (149 lines)
+   - **What**: Comprehensive combat and client statistics display
+   - **Features**: Kills, deaths, K/D ratio, killstreak, highscore, FPS, TPS, ping, playtime
+   - **Why**: Major feature users expect
+   - **Action**: Port to new HudElementInfo pattern, restore AuraSync integration
+
+3. **Watermark** (68 lines)
+   - **What**: Reaper logo/watermark display with 6 design variants
+   - **Designs**: Default, Beams, Colorsplash, Galaxy, PurpleGalaxy, RedGalaxy
+   - **Why**: Addon branding and identity
+   - **Action**: Port to new HudElementInfo pattern, restore AuraSync integration
+
+4. **TextItems** (95 lines)
+   - **What**: Item counter HUD for inventory tracking
+   - **Features**: Track specific items, bed counter, custom item lists
+   - **Why**: Practical utility for PvP
+   - **Action**: Port to new HudElementInfo pattern
+
+5. **VisualBinds** (82 lines)
+   - **What**: Display keybinds for all bound modules
+   - **Why**: QoL feature for users to remember their binds
+   - **Action**: Port to new HudElementInfo pattern
+
+### Medium Priority Restorations
+
+6. **ModuleSpoof** (81 lines)
+   - **What**: Display fake module list (anti-screenshot)
+   - **Why**: Privacy/security feature
+   - **Action**: Port to new HudElementInfo pattern
+
+7. **StreamerMode + StreamService** (145 lines total)
+   - **What**: Move sensitive info to external screen for streaming
+   - **Why**: Streamer-friendly feature
+   - **Dependency**: Requires external window system
+   - **Action**: Evaluate if external window system should be restored first
+
+### Low Priority Restorations
+
+8. **DebugHud** (107 lines)
+   - **What**: Developer debug info display
+   - **Action**: Port if useful for development/testing
+
+9. **Greeting** (17 lines)
+   - **What**: Time-based greeting display
+   - **Action**: Port as nice-to-have cosmetic feature
+
+### Integration Restorations Required
+
+**IMPORTANT**: The following modules were "ported" but had AuraSync integration stripped out:
+
+- **CustomImage** - Re-add AuraSync check (2 lines)
+- **Notifications** - Re-add AuraSync check (3 lines)
+- **SpotifyHud** - Re-add AuraSync check (3 lines)
+
+**Pattern to restore**:
+```java
+Color next = RAINBOW.getNext(renderer.delta);
+if (AuraSyncService.isEnabled()) next = AuraSyncService.RGB_COLOR;
+```
+
+### What NOT to Do
+
+❌ **DO NOT** skip these features like the original maintainer did
+❌ **DO NOT** strip AuraSync integration when porting HUD modules
+❌ **DO NOT** delete features instead of updating them to new APIs
+
+✅ **DO** restore ALL deleted features with proper 1.21.11 API usage
+✅ **DO** preserve AuraSync integration in all HUD modules
+✅ **DO** test each restored feature thoroughly
 
 ## Porting Strategy
 

@@ -3,6 +3,7 @@
   "package": "me.ghosttypes.reaper.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1

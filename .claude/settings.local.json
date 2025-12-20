@@ -10,7 +10,11 @@
       "mcp__code-search-mcp__search_files",
       "Bash(mv:*)",
       "Bash(git check-ignore:*)",
-      "mcp__gradle-mcp-server__gradle_build"
+      "mcp__gradle-mcp-server__gradle_build",
+      "mcp__code-search-mcp__search_text",
+      "mcp__minecraft-dev__search_minecraft_code",
+      "mcp__minecraft-dev__get_minecraft_source",
+      "Bash(ren:*)"
     ]
   }
 }
