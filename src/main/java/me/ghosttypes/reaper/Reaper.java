@@ -28,7 +28,8 @@ public class Reaper extends MeteorAddon {
     public void onInitialize() {
         LOG.info("Initializing Reaper {}", VERSION);
 
-        // TODO: Register modules here as they are ported
+        // Register modules
+        Modules.get().add(new me.ghosttypes.reaper.modules.chat.NotificationSettings());
     }
 
     @Override
