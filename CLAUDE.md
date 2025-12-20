@@ -556,6 +556,69 @@ Quick overview when porting modules from 1.19.4 to 1.21.11:
 - Setting/Config system changes in Meteor Client
 - Event system updates
 
+## Current Porting Progress
+
+**Last Updated:** 2025-12-20
+
+### ✅ Completed (Phase 1-3)
+
+**Utilities (Phase 1-2):**
+- ✅ `util/misc/MathUtil.java` - Math utilities with 1.21.11 API updates
+- ✅ `util/misc/SystemTimer.java` - Timer utility
+- ✅ `util/misc/Task.java` - Single-execution task wrapper
+- ✅ `util/misc/AnglePos.java` - Position with yaw/pitch wrapper
+- ✅ `util/os/OSUtil.java` - OS detection and message boxes
+- ✅ `util/os/FileHelper.java` - File operations and HTTP downloads
+
+**Infrastructure (Phase 3):**
+- ✅ `util/services/TL.java` - Thread pool manager for async operations
+- ✅ `util/services/NotificationManager.java` - Notification queue with auto-expiry
+- ✅ `modules/chat/NotificationSettings.java` - User-configurable notification settings
+- ✅ `util/misc/ReaperModule.java` - Base class that routes module messages to notifications
+
+**Build System:**
+- ✅ Gradle 9.2.0 configured
+- ✅ Modern Kotlin DSL build.gradle.kts
+- ✅ Version catalog (gradle/libs.versions.toml)
+- ✅ Java 21 compilation
+- ✅ All dependencies for 1.21.11
+
+### 🚧 Next Steps
+
+**Remaining Utilities:**
+- `util/misc/MessageUtil.java` - Chat message utilities (depends on TL ✅)
+- `util/misc/Formatter.java` - String formatting with placeholders
+- `util/world/PlayerHelper.java` - Player state utilities
+- `util/world/RotationHelper.java` - Rotation management
+- `util/world/BlockHelper.java` - Block placement utilities
+- `util/combat/CombatHelper.java` - Combat calculations
+- `util/combat/DamageCalculator.java` - Damage prediction
+
+**Simple Modules (Recommended Next):**
+- Chat modules: AutoLogin, Welcomer, ChatTweaks, AutoEZ, PopCounter
+- Misc modules: AutoRespawn, MultiTask, RPC, ConfigTweaker
+
+**Complex Systems (Later):**
+- Combat modules (35+ modules extend ReaperModule)
+- HUD modules (CustomImage, Notifications, Killfeed, SpotifyHud)
+- Render modules (ExternalHUD, ReaperHoleESP)
+- ElytraBot subsystem (reference: meteor-rejects-v2)
+- Services (ResourceLoaderService, GlobalManager)
+
+**Deleted Features to Restore:**
+- AuraSync + AuraSyncService (RGB sync system)
+- Stats module (combat/client statistics)
+- Watermark (branding with 6 design variants)
+- TextItems, VisualBinds, ModuleSpoof, StreamerMode, DebugHud, Greeting
+
+### 📊 Statistics
+
+- **Completed:** 10 files (6 utilities, 4 infrastructure)
+- **Total Lines Ported:** ~600 lines
+- **Modules Ready:** 1 (NotificationSettings)
+- **Base Classes Ready:** ReaperModule (enables 35+ modules)
+- **Build Status:** ✅ Working (commits: 36bf39e, 083af17)
+
 ## File Structure Notes
 
 **Asset Management**:
