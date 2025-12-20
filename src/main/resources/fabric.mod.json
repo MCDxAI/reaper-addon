@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "reaper",
+  "version": "${version}",
+  "name": "Reaper",
+  "description": "The Best Meteor Addon",
+  "authors": [
+    "GhostTypes"
+  ],
+  "contact": {
+    "sources": "https://github.com/MCDxAI/reaper-addon"
+  },
+  "icon": "assets/reaper/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "meteor": [
+      "me.ghosttypes.reaper.Reaper"
+    ]
+  },
+  "mixins": [
+    "reaper.mixins.json"
+  ],
+  "custom": {
+    "meteor-client:color": "225,25,25",
+    "modmenu": {
+      "parent": {
+        "id": "meteor-client"
+      }
+    }
+  },
+  "depends": {
+    "java": ">=21",
+    "minecraft": ["${mc_version}"],
+    "meteor-client": "*"
+  }
+}
