@@ -32,10 +32,12 @@ public class Reaper extends MeteorAddon {
         // Register chat modules
         Modules.get().add(new me.ghosttypes.reaper.modules.chat.NotificationSettings());
         Modules.get().add(new me.ghosttypes.reaper.modules.chat.AutoLogin());
+        Modules.get().add(new me.ghosttypes.reaper.modules.chat.Welcomer());
 
         // Register misc modules
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.MultiTask());
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.AutoRespawn());
+        Modules.get().add(new me.ghosttypes.reaper.modules.misc.NoProne());
     }
 
     @Override
