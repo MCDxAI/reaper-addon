@@ -19,6 +19,10 @@ repositories {
     }
 }
 
+loom {
+    accessWidenerPath = file("src/main/resources/reaper.accesswidener")
+}
+
 dependencies {
     // Fabric
     minecraft(libs.minecraft)

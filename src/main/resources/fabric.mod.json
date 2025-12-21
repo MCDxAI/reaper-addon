@@ -20,6 +20,7 @@
   "mixins": [
     "reaper.mixins.json"
   ],
+  "accessWidener": "reaper.accesswidener",
   "custom": {
     "meteor-client:color": "225,25,25",
     "modmenu": {

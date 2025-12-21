@@ -1,0 +1,4 @@
+accessWidener	v2	named
+
+# ClientPlayerInteractionManager - needed for sequenced packet sending (combat modules)
+accessible   method  net/minecraft/client/network/ClientPlayerInteractionManager sendSequencedPacket (Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/network/SequencedPacketCreator;)V
