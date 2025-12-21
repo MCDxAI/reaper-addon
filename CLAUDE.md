@@ -21,6 +21,17 @@ The original 1.19.4 source has been moved to `ai_reference/reaper-1.19.4/` as a 
 - Starting fresh with modern best practices ensures clean, maintainable code
 - Original source is preserved as searchable reference (just like other addons in `ai_reference/`)
 
+### Excluded Features
+
+**CRITICAL: See DO_NOT_PORT.md for complete list of features we are NOT porting.**
+
+Some features from the original 1.19.4 implementation are intentionally excluded:
+- **Replaced by other projects**: SpotifyService (→ meteor-mcp-addon), External Rendering modules (→ meteor-client-webgui), elytrabot package (→ meteor-rejects-v2)
+- **Unfinished/incomplete**: GhostCA (stub with no implementation)
+- **Unused utilities**: MultipartUtility (file upload, never called)
+
+Always check `DO_NOT_PORT.md` before porting any feature to avoid duplicate work or porting obsolete code.
+
 ## Critical Porting Context
 
 This is one of the most challenging ports due to:
@@ -36,9 +47,9 @@ This is one of the most challenging ports due to:
 
 The `ai_reference/` folder contains critical reference implementations:
 - **reaper-1.19.4** - **ORIGINAL SOURCE CODE** - The complete original Reaper addon from Minecraft 1.19.4 - use this to understand original functionality, logic, and feature implementations when porting modules
-- **reaper-deleted-features** - **DELETED FEATURES ARCHIVE** - Contains 11 modules/services (823 lines) that were lazily deleted in commit `72bcc034` instead of being properly ported. Includes AuraSync (RGB sync system), Stats (combat/client stats), Watermark (branding), VisualBinds, TextItems, StreamerMode, and more. **RESTORE ALL OF THESE** when porting to 1.21.11. See `INTERCONNECTIONS.md` for AuraSync system architecture.
+- **reaper-deleted-features** - **DELETED FEATURES ARCHIVE (FULLY REVIEWED)** - Previously contained 11 modules/services (823 lines) that were lazily deleted in commit `72bcc034` instead of being properly ported. **ALL features have been reviewed**: 9 features (AuraSync, Stats, Watermark, VisualBinds, TextItems, ModuleSpoof, DebugHud, Greeting, AuraSyncService) have been **successfully restored** in the 1.21.11 port. Only StreamerMode and StreamService are excluded (replaced by meteor-client-webgui). **This directory can now be safely deleted.**
 - **meteor-mcp-addon** - **FIRST-PARTY REFERENCE** - **USE THIS FOR BUILD CONFIGURATION** - Perfect example of modern build.gradle.kts, gradle/libs.versions.toml, Gradle 9 patterns, complex dependency management
-- **meteor-rejects-v2** - **FIRST-PARTY REFERENCE** - Successfully ported to 1.21.11, contains ElytraBot implementation (likely same/similar code as this addon's ElytraBot)
+- **meteor-rejects-v2** - **FIRST-PARTY REFERENCE** - Successfully ported to 1.21.11, contains ElytraBot implementation (same code as reaper-1.19.4's elytrabot - **already ported there, see DO_NOT_PORT.md**)
 - **meteor-client** - Official Meteor Client source (current API)
 - **Trouser-Streak** - Large addon (66 modules, 511 stars, updated to 1.21.11)
 - **meteor-addon-template** - Official template with current best practices
@@ -46,15 +57,13 @@ The `ai_reference/` folder contains critical reference implementations:
 - **Numby-hack** - 22 modules with diverse feature implementations
 - **Nora-Tweaks** - Recently updated with multi-version support
 
-**IMPORTANT**: The `ai_reference/` directory is in `.gitignore` but you MUST still read and search it whenever you need reference implementations. It provides the fastest and most accurate way to understand current API usage patterns, gradle configurations, and implementation approaches for 1.21.11.
 
-**meteor-rejects-v2 is especially valuable** because it was previously ported from an older version to 1.21.11 and contains the same ElytraBot code that exists in this addon. Use it as the primary reference for understanding how existing Reaper code should be updated.
+**IMPORTANT**: The `ai_reference/` directory is in `.gitignore` but you MUST still read and search it whenever you need reference implementations. It provides the fastest and most accurate way to understand current API usage patterns, gradle configurations, and implementation approaches for 1.21.11.
 
 **meteor-mcp-addon is the authoritative build configuration reference** - it has perfect examples of modern Gradle 9 patterns, Kotlin DSL, version catalogs, and complex dependency management with shading.
 
 Always search `ai_reference/` when:
 - **Understanding original Reaper functionality** - check reaper-1.19.4 to see how modules worked originally
-- **Restoring deleted features** - check reaper-deleted-features for AuraSync, Stats, Watermark, VisualBinds, TextItems, StreamerMode, and their interconnections
 - **Updating build configuration** - check meteor-mcp-addon's build.gradle.kts and gradle/libs.versions.toml
 - **Migrating to Gradle 9** - meteor-mcp-addon shows all correct patterns
 - **Porting modules** - check reaper-1.19.4 for original logic, then meteor-rejects-v2 or other addons for 1.21.11 patterns
@@ -63,7 +72,7 @@ Always search `ai_reference/` when:
 - Understanding how mixins should be structured for 1.21.11
 - Finding examples of specific module types or features
 - Checking fabric.mod.json structure for current versions
-- **Porting ElytraBot** - compare reaper-1.19.4's implementation with meteor-rejects-v2's ported version
+
 
 ## Code Search Tools
 
@@ -415,25 +424,24 @@ Custom events in `events/`:
 - `DeathEvent` - Player death detection
 - `InteractEvent` - Interaction tracking
 - `UpdateHeldItemEvent` - Item switch detection
-- `CancellablePlayerMoveEvent` - Movement control (used by ElytraBot)
+- `CancellablePlayerMoveEvent` - Movement control (originally used by ElytraBot - see DO_NOT_PORT.md)
 
-### External Rendering
+### External Rendering (**NOT BEING PORTED - see DO_NOT_PORT.md**)
 
-The addon includes a sophisticated external window system:
+The original addon included a sophisticated external window system (replaced by meteor-client-webgui):
 - `ExternalWindow.java` - Base window implementation using native rendering
 - `ExternalRenderers.java` - Rendering pipeline for external windows
 - Modules: `ExternalHUD`, `ExternalFeed`, `ExternalNotifications`
 
-This allows rendering game information in separate OS windows outside Minecraft.
+This allowed rendering game information in separate OS windows outside Minecraft.
 
-### Complex Subsystems
+### Complex Subsystems (**NOT BEING PORTED - see DO_NOT_PORT.md**)
 
-**ElytraBot** (`modules/misc/elytrabot/`):
+**ElytraBot** (`modules/misc/elytrabot/`)  - **Already ported to meteor-rejects-v2**:
 - Threaded pathfinding system with A* algorithm
 - Multiple flight modes (ElytraFly, PacketFly)
 - Custom movement events and utilities
 - Timer and direction utilities for precise movement
-- **NOTE**: The same/similar ElytraBot code exists in `ai_reference/meteor-rejects-v2` already ported to 1.21.11 - use as direct reference
 
 ## Deleted Features - RESTORED
 
@@ -540,7 +548,7 @@ Quick overview when porting modules from 1.19.4 to 1.21.11:
 - ✅ `modules/chat/BedAlerts.java` - Nearby bed holder detection
 - ✅ `modules/chat/HoleAlert.java` - Hole break detection with auto-reinforce
 
-**Misc Modules (9 ported):**
+**Misc Modules (12 ported):**
 - ✅ `modules/misc/MultiTask.java` - Multi-tasking utility
 - ✅ `modules/misc/AutoRespawn.java` - Auto-respawn on death
 - ✅ `modules/misc/NoProne.java` - Prevent prone state
@@ -550,11 +558,14 @@ Quick overview when porting modules from 1.19.4 to 1.21.11:
 - ✅ `modules/misc/AntiAim.java` - Anti-aim rotation to confuse opponents
 - ✅ `modules/misc/OldAnimations.java` - 1.8-style hit animations
 - ✅ `modules/misc/StrictMove.java` - Lag-back mitigation
+- ✅ `modules/misc/RPC.java` - Discord Rich Presence integration
+- ✅ `modules/misc/OneTap.java` - Bow/projectile exploit
+- ✅ `modules/misc/WideScaffold.java` - Wide area scaffold placement
 
 **HUD Modules (9/9 Complete):**
 - ✅ `modules/hud/AuraSync.java` - RGB sync control element
 - ✅ `modules/hud/Stats.java` - Combat/client statistics
-- ✅ `modules/hud/Watermark.java` - Logo with 6 designs
+- ✅ `modules/hud/Watermark.java` - Logo watermark with chroma/color support (uses local icon.png)
 - ✅ `modules/hud/TextItems.java` - Inventory item counter
 - ✅ `modules/hud/VisualBinds.java` - Keybind display
 - ✅ `modules/hud/ModuleSpoof.java` - Fake module list
@@ -572,27 +583,22 @@ Quick overview when porting modules from 1.19.4 to 1.21.11:
 - ✅ Access widener for sendSequencedPacket
 - ✅ All dependencies for 1.21.11
 
-### 🚧 Next Steps: Complete Misc, Then Combat
+### 🚧 Next Steps: Combat Modules
 
-**Remaining Misc Modules (3 to port):**
-- RPC (Discord Rich Presence - simple)
-- OneTap (medium complexity - uses combat utilities)
-- WideScaffold (medium complexity - uses combat utilities)
+**All Misc Modules Complete! (12/12)**
 
-**Skipping:**
-- PacketFly (~30k lines - too complex, low priority)
-- ElytraBot subsystem (per user instructions)
-
-**After Misc: Combat Modules (35+)**
+**Ready for Combat Modules (35+ modules):**
 - All dependencies ready
 - All combat utilities complete (BlockHelper, CombatHelper, DamageCalculator, PacketManager)
+- All render utilities ready (Renderers.SimpleBlockRender)
 
 ### 📊 Statistics
 
-- **Completed:** 55+ files
-- **Total Lines Ported:** ~5300+ lines
-- **Modules Ready:** 26 (9 chat, 9 misc, 8 HUD)
+- **Completed:** 60+ files
+- **Total Lines Ported:** ~5600+ lines
+- **Modules Ready:** 29 (9 chat, 12 misc, 8 HUD)
 - **Combat Utilities:** 4 (1086 lines)
+- **Render Utilities:** 1 (SimpleBlockRender)
 - **Build Status:** ✅ Working
 
 ## File Structure Notes

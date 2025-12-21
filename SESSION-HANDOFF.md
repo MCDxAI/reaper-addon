@@ -12,9 +12,9 @@ The backend infrastructure is **COMPLETE**. All HUD features are **RESTORED**. T
 
 ### What's Working Now
 
-**26 Modules Ready:**
+**29 Modules Ready:**
 - **Chat (9):** NotificationSettings, AutoLogin, Welcomer, ArmorAlert, PopCounter, AutoEZ, ChatTweaks, BedAlerts, HoleAlert
-- **Misc (9):** MultiTask, AutoRespawn, NoProne, NoDesync, ChorusPredict, ConfigTweaker, AntiAim, OldAnimations, StrictMove
+- **Misc (12):** MultiTask, AutoRespawn, NoProne, NoDesync, ChorusPredict, ConfigTweaker, AntiAim, OldAnimations, StrictMove, RPC, OneTap, WideScaffold
 - **HUD (8):** AuraSync, Stats, Watermark, TextItems, VisualBinds, ModuleSpoof, DebugHud, Greeting
 
 **Infrastructure Complete:**
@@ -35,48 +35,14 @@ The backend infrastructure is **COMPLETE**. All HUD features are **RESTORED**. T
 
 ---
 
-## KNOWN ISSUES
+## NEXT STEPS: Combat Modules
 
-### ⚠️ Missing Watermark Logo Assets
+**All Misc Modules Complete! (12/12)**
 
-**Problem:** Watermark HUD module shows missing textures (black/pink checkerboard)
-
-**Root Cause:**
-- Logo assets downloaded from `https://github.com/GhostTypes/reaper-assets`
-- Repository no longer exists
-- Missing 6 logo files:
-  - `reaper_white.png` (Default logo)
-  - `icon_beams-min.png` (Beams design)
-  - `icon_colorsplash-min.png` (Colorsplash design)
-  - `icon_galaxy_1-min.png` (Galaxy design)
-  - `icon_purple_galaxy-min.png` (PurpleGalaxy design)
-  - `icon_red-min.png` (RedGalaxy design)
-
-**Solution:**
-1. Track down original logo assets from reaper-1.19.4 build/old installations
-2. Upload to MCDxAI repo (create `reaper-assets` repo or add to addon repo)
-3. Update ResourceLoaderService.java URLs to point to new location
-
-**Affected Code:**
-- `src/main/java/me/ghosttypes/reaper/util/services/ResourceLoaderService.java` (lines 46-52, 56-64)
-- `src/main/java/me/ghosttypes/reaper/modules/hud/Watermark.java`
-
----
-
-## NEXT STEPS: Complete Misc, Then Combat
-
-**Remaining Misc Modules (3 to port):**
-- RPC (Discord Rich Presence - simple)
-- OneTap (medium complexity - uses combat utilities)
-- WideScaffold (medium complexity - uses combat utilities)
-
-**Skipping:**
-- PacketFly (~30k lines - too complex, low priority)
-- ElytraBot subsystem (per user instructions)
-
-**After Misc: Combat Modules (35+)**
+**Ready for Combat Modules (35+ modules):**
 - All dependencies ready
-- All combat utilities complete
+- All combat utilities complete (BlockHelper, CombatHelper, DamageCalculator, PacketManager)
+- All render utilities ready (Renderers.SimpleBlockRender)
 
 ---
 
@@ -120,14 +86,15 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 
 | Metric | Count |
 |--------|-------|
-| Modules Ready | 26 (9 chat, 9 misc, 8 HUD) |
+| Modules Ready | 29 (9 chat, 12 misc, 8 HUD) |
 | Combat Utilities | 4 (1086 lines) |
+| Render Utilities | 1 (SimpleBlockRender) |
 | Services Complete | 7 |
 | Events Complete | 4 |
 | Mixins | 2 |
-| Total Lines Ported | ~5300+ |
+| Total Lines Ported | ~5600+ |
 | Build Status | Passing |
-| Latest Commit | 22b3584 |
+| Latest Commit | TBD |
 
 ---
 
