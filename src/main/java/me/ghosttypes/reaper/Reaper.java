@@ -1,9 +1,11 @@
 package me.ghosttypes.reaper;
 
+import me.ghosttypes.reaper.modules.hud.*;
 import me.ghosttypes.reaper.util.services.SL;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.addons.GithubRepo;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
+import meteordevelopment.meteorclient.systems.hud.Hud;
 import meteordevelopment.meteorclient.systems.hud.HudGroup;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
@@ -64,6 +66,16 @@ public class Reaper extends MeteorAddon {
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.NoProne());
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.NoDesync());
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.ChorusPredict());
+
+        // Register HUD elements
+        Hud.get().register(AuraSync.INFO);
+        Hud.get().register(Stats.INFO);
+        Hud.get().register(Watermark.INFO);
+        Hud.get().register(TextItems.INFO);
+        Hud.get().register(VisualBinds.INFO);
+        Hud.get().register(ModuleSpoof.INFO);
+        Hud.get().register(DebugHud.INFO);
+        Hud.get().register(Greeting.INFO);
 
         // Load services
         SL.load();

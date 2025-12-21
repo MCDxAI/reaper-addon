@@ -560,9 +560,9 @@ Quick overview when porting modules from 1.19.4 to 1.21.11:
 
 **Last Updated:** 2025-12-21
 
-### ✅ Completed (Phase 1-4)
+### ✅ Completed
 
-**Utilities (Phase 1-2):**
+**Utilities:**
 - ✅ `util/misc/MathUtil.java` - Math utilities with 1.21.11 API updates
 - ✅ `util/misc/SystemTimer.java` - Timer utility
 - ✅ `util/misc/Task.java` - Single-execution task wrapper
@@ -573,10 +573,14 @@ Quick overview when porting modules from 1.19.4 to 1.21.11:
 - ✅ `util/os/FileHelper.java` - File operations and HTTP downloads
 - ✅ `util/world/PlayerHelper.java` - Player state utilities
 - ✅ `util/world/RotationHelper.java` - Rotation management
-- ✅ `util/player/Interactions.java` - Player interactions (~360 lines, major 1.21.11 API updates)
+- ✅ `util/world/BlockHelper.java` - Block placement utilities (~466 lines)
+- ✅ `util/world/CombatHelper.java` - Combat calculations (~230 lines)
+- ✅ `util/world/DamageCalculator.java` - Damage prediction (~230 lines)
+- ✅ `util/network/PacketManager.java` - Packet handling (~160 lines)
+- ✅ `util/player/Interactions.java` - Player interactions (~360 lines)
 - ✅ `util/player/Stats.java` - Combat/client statistics tracking
 
-**Infrastructure (Phase 3):**
+**Infrastructure:**
 - ✅ `util/services/TL.java` - Thread pool manager for async operations
 - ✅ `util/services/SL.java` - Service loader initialization
 - ✅ `util/services/NotificationManager.java` - Notification queue with auto-expiry
@@ -590,7 +594,7 @@ Quick overview when porting modules from 1.19.4 to 1.21.11:
 - ✅ `events/UpdateHeldItemEvent.java` - Item switch detection
 - ✅ `events/CancellablePlayerMoveEvent.java` - Movement control
 
-**Chat Modules (Phase 4):**
+**Chat Modules (9/9 Complete):**
 - ✅ `modules/chat/NotificationSettings.java` - User-configurable notification settings
 - ✅ `modules/chat/AutoLogin.java` - Auto-login with password
 - ✅ `modules/chat/Welcomer.java` - Welcome messages for players
@@ -599,53 +603,58 @@ Quick overview when porting modules from 1.19.4 to 1.21.11:
 - ✅ `modules/chat/AutoEZ.java` - Kill messages with placeholders
 - ✅ `modules/chat/ChatTweaks.java` - Custom prefix, emotes, chroma
 - ✅ `modules/chat/BedAlerts.java` - Nearby bed holder detection
+- ✅ `modules/chat/HoleAlert.java` - Hole break detection with auto-reinforce
 
-**Misc Modules:**
+**Misc Modules (6 ported):**
 - ✅ `modules/misc/MultiTask.java` - Multi-tasking utility
 - ✅ `modules/misc/AutoRespawn.java` - Auto-respawn on death
 - ✅ `modules/misc/NoProne.java` - Prevent prone state
+- ✅ `modules/misc/ConfigTweaker.java` - Config utilities
+- ✅ `modules/misc/NoDesync.java` - Ghost block prevention
+- ✅ `modules/misc/ChorusPredict.java` - Chorus teleport prediction
 
 **Build System:**
 - ✅ Gradle 9.2.0 configured
 - ✅ Modern Kotlin DSL build.gradle.kts
 - ✅ Version catalog (gradle/libs.versions.toml)
 - ✅ Java 21 compilation
+- ✅ Access widener for sendSequencedPacket
 - ✅ All dependencies for 1.21.11
 
-### 🚧 Next Steps
+### 🚧 Current Priority: Restore Deleted Features
 
-**Remaining Utilities:**
-- `util/world/BlockHelper.java` - Block placement utilities (complex, many dependencies)
-- `util/combat/CombatHelper.java` - Combat calculations
-- `util/combat/DamageCalculator.java` - Damage prediction
-- `util/network/PacketManager.java` - Packet handling
+**Skipping:** StreamerMode, StreamService (headless mixin causes errors, will integrate with WebGUI later)
 
-**Remaining Chat Modules:**
-- `modules/chat/HoleAlert.java` - Requires BlockHelper
+| Feature | Type | Status |
+|---------|------|--------|
+| AuraSyncService | Service | PENDING |
+| AuraSync | HUD Module | PENDING |
+| Stats | HUD Module | PENDING |
+| Watermark | HUD Module | PENDING |
+| TextItems | HUD Module | PENDING |
+| VisualBinds | HUD Module | PENDING |
+| ModuleSpoof | HUD Module | PENDING |
+| DebugHud | HUD Module | PENDING |
+| Greeting | HUD Module | PENDING |
 
-**Simple Modules (Recommended Next):**
-- Misc modules: RPC, ConfigTweaker, PacketFly
-- Render modules: Simple ESP modules
+### 🔜 After Deleted Features
 
-**Complex Systems (Later):**
-- Combat modules (35+ modules extend ReaperModule)
-- HUD modules (CustomImage, Notifications, Killfeed, SpotifyHud)
-- Render modules (ExternalHUD, ReaperHoleESP)
-- ElytraBot subsystem (reference: meteor-rejects-v2)
+**Remaining Misc Modules (7):**
+- AntiAim, OldAnimations, RPC, StrictMove (simple)
+- OneTap, WideScaffold (medium complexity)
+- PacketFly (~30k lines - skip for now)
+- ElytraBot subsystem (skip per user instructions)
 
-**Deleted Features to Restore:**
-- AuraSync + AuraSyncService (RGB sync system)
-- Stats HUD module (combat/client statistics display)
-- Watermark (branding with 6 design variants)
-- TextItems, VisualBinds, ModuleSpoof, StreamerMode, DebugHud, Greeting
+**Combat Modules (35+):**
+- All dependencies ready - can begin after deleted features
 
 ### 📊 Statistics
 
-- **Completed:** 30+ files (12 utilities, 6 infrastructure, 4 events, 11 modules)
-- **Total Lines Ported:** ~2500+ lines
-- **Modules Ready:** 11 (8 chat, 3 misc)
-- **Base Classes Ready:** ReaperModule (enables 35+ modules)
-- **Build Status:** ✅ Working (latest: 5bf2d54)
+- **Completed:** 40+ files
+- **Total Lines Ported:** ~3600+ lines
+- **Modules Ready:** 14 (9 chat, 5 misc)
+- **Combat Utilities:** 4 (1086 lines)
+- **Build Status:** ✅ Working (latest: 054260c)
 
 ## File Structure Notes
 
