@@ -56,6 +56,7 @@ public class Reaper extends MeteorAddon {
         Modules.get().add(new me.ghosttypes.reaper.modules.chat.AutoEZ());
         Modules.get().add(new me.ghosttypes.reaper.modules.chat.ChatTweaks());
         Modules.get().add(new me.ghosttypes.reaper.modules.chat.BedAlerts());
+        Modules.get().add(new me.ghosttypes.reaper.modules.chat.HoleAlert());
 
         // Register misc modules
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.MultiTask());
