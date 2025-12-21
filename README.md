@@ -1,36 +1,54 @@
+<div align="center">
+
 # Reaper
 
-A Meteor Client addon for Minecraft 1.21.11
+**A comprehensive Meteor Client addon featuring combat, utility, and rendering modules**
 
-## Development Status
+![License](https://img.shields.io/badge/License-CC0_1.0-blue?style=flat)
+![Minecraft](https://img.shields.io/badge/Minecraft-1.21.11-brightgreen?style=flat)
+![Meteor_Client](https://img.shields.io/badge/Meteor_Client-Addon-orange?style=flat)
 
-🚧 **Currently porting from 1.19.4 to 1.21.11** 🚧
+**Currently being rebuilt from the ground up for Minecraft 1.21.11**
 
-This addon is being rebuilt from the ground up for Minecraft 1.21.11 using modern development practices.
+</div>
 
-## About
+<div align="center">
 
-**The Best Meteor Addon** - A comprehensive Meteor Client addon featuring combat, utility, and rendering modules.
+| Project Status | Details |
+| --- | --- |
+| **Current Goal** | Full port from 1.19.4 to 1.21.11 |
+| **Progress** | 26 Modules ready • Backend infrastructure complete • Combat utilities ready |
+| **Reference** | Original 1.19.4 source preserved in `ai_reference/reaper-1.19.4/` |
+| **Architecture** | Gradle 9.2.0 • Java 21 • Modern Fabric implementation |
 
-### Original Source
+</div>
 
-The original 1.19.4 implementation is preserved in `ai_reference/reaper-1.19.4/` for reference purposes.
+<div align="center">
 
-## Building
+| Feature Category | Included Modules |
+| --- | --- |
+| **Chat** | NotificationSettings, AutoLogin, Welcomer, ArmorAlert, PopCounter, AutoEZ, ChatTweaks, BedAlerts, HoleAlert |
+| **HUD** | AuraSync, Stats, Watermark, TextItems, VisualBinds, ModuleSpoof, DebugHud, Greeting |
+| **Misc** | MultiTask, AutoRespawn, NoProne, NoDesync, ChorusPredict, ConfigTweaker, AntiAim, OldAnimations, StrictMove |
+| **Services** | Thread Pool Manager, Notification Manager, Global Event System, Resource Loader |
 
-```bash
-./gradlew build
-```
+</div>
 
-The built JAR will be in `build/libs/`
+<div align="center">
 
-## Development
+| Build Action | Command |
+| --- | --- |
+| **Build** | `./gradlew build` – Compiles and packages the addon |
+| **Clean** | `./gradlew clean` – Cleans build artifacts |
+| **Output** | JAR file will be generated in `build/libs/` |
 
-- **Minecraft**: 1.21.11
-- **Fabric Loader**: 0.18.2
-- **Meteor Client**: 1.21.11-SNAPSHOT
-- **Java**: 21
+</div>
 
-## License
+<div align="center">
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+| License Information | |
+| --- | --- |
+| **License** | CC0-1.0 Universal |
+| **Terms** | Public Domain Dedication |
+
+</div>

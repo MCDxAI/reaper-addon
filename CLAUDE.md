@@ -572,16 +572,20 @@ Quick overview when porting modules from 1.19.4 to 1.21.11:
 - ✅ Access widener for sendSequencedPacket
 - ✅ All dependencies for 1.21.11
 
-### 🚧 Current Priority: Remaining Misc Modules
+### 🚧 Next Steps: Complete Misc, Then Combat
 
-**Remaining Misc Modules (3):**
-- RPC (Discord Rich Presence)
-- OneTap, WideScaffold (medium complexity)
-- PacketFly (~30k lines - skip for now)
-- ElytraBot subsystem (skip per user instructions)
+**Remaining Misc Modules (3 to port):**
+- RPC (Discord Rich Presence - simple)
+- OneTap (medium complexity - uses combat utilities)
+- WideScaffold (medium complexity - uses combat utilities)
 
-**Combat Modules (35+):**
-- All dependencies ready - can begin after misc modules
+**Skipping:**
+- PacketFly (~30k lines - too complex, low priority)
+- ElytraBot subsystem (per user instructions)
+
+**After Misc: Combat Modules (35+)**
+- All dependencies ready
+- All combat utilities complete (BlockHelper, CombatHelper, DamageCalculator, PacketManager)
 
 ### 📊 Statistics
 

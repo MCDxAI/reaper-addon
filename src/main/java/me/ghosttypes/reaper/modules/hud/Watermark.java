@@ -29,26 +29,10 @@ public class Watermark extends HudElement {
         Watermark::new
     );
 
-    public enum LogoDesign {
-        Default,
-        Beams,
-        Colorsplash,
-        Galaxy,
-        PurpleGalaxy,
-        RedGalaxy
-    }
-
     private static final RainbowColor RAINBOW = new RainbowColor();
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgScale = settings.createGroup("Scale");
-
-    public final Setting<LogoDesign> logo = sgGeneral.add(new EnumSetting.Builder<LogoDesign>()
-        .name("logo")
-        .description("Which logo to use.")
-        .defaultValue(LogoDesign.Default)
-        .build()
-    );
 
     private final Setting<Double> boxW = sgGeneral.add(new DoubleSetting.Builder()
         .name("width")
@@ -72,7 +56,6 @@ public class Watermark extends HudElement {
         .name("chroma")
         .description("Chroma logo animation.")
         .defaultValue(false)
-        .visible(() -> logo.get() == LogoDesign.Default)
         .build()
     );
 
@@ -126,23 +109,14 @@ public class Watermark extends HudElement {
         double h = boxH.get() * logoScale;
         setSize(w, h);
 
-        Identifier logoId = switch (logo.get()) {
-            case Default -> LOGO;
-            case Beams -> LOGO_BEAMS;
-            case Colorsplash -> LOGO_COLORSPLASH;
-            case Galaxy -> LOGO_GALAXY;
-            case PurpleGalaxy -> LOGO_PURPLE;
-            case RedGalaxy -> LOGO_RED;
-        };
-
         Color renderColor;
-        if (chroma.get() && logo.get() == LogoDesign.Default) {
+        if (chroma.get()) {
             RAINBOW.setSpeed(chromaSpeed.get() / 100);
             renderColor = AuraSyncService.isEnabled() ? AuraSyncService.RGB_COLOR : RAINBOW.getNext(renderer.delta);
         } else {
             renderColor = color.get();
         }
 
-        renderer.texture(logoId, x, y, w, h, renderColor);
+        renderer.texture(LOGO, x, y, w, h, renderColor);
     }
 }

@@ -299,20 +299,8 @@ public class Interactions {
         return ResourceLoaderService.DEVELOPERS.contains(getIGNSafe());
     }
 
-    public static boolean isBetaUser() {
-        return false;
-    }
-
     public static boolean isDev(String ign) {
         return ResourceLoaderService.DEVELOPERS.contains(ign);
-    }
-
-    public static boolean isBeta(String ign) {
-        return ResourceLoaderService.BETA.contains(ign);
-    }
-
-    public static boolean isUser(String ign) {
-        return ResourceLoaderService.USER.contains(ign);
     }
 
     public static String getCurrentPing() {

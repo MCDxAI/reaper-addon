@@ -18,7 +18,6 @@ public class SL {
         MeteorClient.EVENT_BUS.subscribe(new GlobalManager()); // subscribe GlobalManager to events
         MessageUtil.init();
         NotificationManager.init();
-        // SpotifyService.init(); - Optional, not ported yet
         Runtime.getRuntime().addShutdownHook(new Thread(TL::shutdown));
         Reaper.log("Started services (" + MathUtil.msPassed(start) + "ms)");
     }

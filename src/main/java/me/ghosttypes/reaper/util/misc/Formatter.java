@@ -2,7 +2,6 @@ package me.ghosttypes.reaper.util.misc;
 
 import me.ghosttypes.reaper.Reaper;
 import me.ghosttypes.reaper.util.player.Stats;
-import me.ghosttypes.reaper.util.services.SpotifyService;
 import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
@@ -64,15 +63,6 @@ public class Formatter {
         if (m.contains("{username}")) m = m.replace("{username}", mc.getSession().getUsername());
         if (m.contains("{hp}")) m = m.replace("{hp}", String.valueOf(Math.rint(PlayerUtils.getTotalHealth())));
 
-        // spotify
-        if (SpotifyService.hasMedia()) {
-            if (m.contains("{songtitle}")) m = m.replace("{songtitle}", SpotifyService.currentTrack);
-            if (m.contains("{songname}")) m = m.replace("{songname}", SpotifyService.currentArtist);
-        } else {
-            if (m.contains("{songtitle}")) m = m.replace("{songtitle}", "Idle");
-            if (m.contains("{songname}")) m = m.replace("{songname}", "Selecting a song");
-        }
-
         // misc
         if (m.contains("{discord}")) m = m.replace("{discord}", Reaper.INVITE_LINK);
 
@@ -102,19 +92,6 @@ public class Formatter {
         return msg;
     }
 
-    public static String getCurrentTrack() {
-        String currentTrack = SpotifyService.currentTrack;
-        if (currentTrack == null) return "Idle";
-        if (currentTrack.isBlank() || currentTrack.isEmpty()) return "Idle";
-        return currentTrack;
-    }
-
-    public static String getCurrentArtist() {
-        String currentArtist = SpotifyService.currentArtist;
-        if (currentArtist == null) return "No song playing";
-        if (currentArtist.isBlank() || currentArtist.isEmpty()) return "No song playing";
-        return currentArtist;
-    }
 
     public static String getGreeting() {
         Calendar c = Calendar.getInstance();

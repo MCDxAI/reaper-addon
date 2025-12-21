@@ -35,13 +35,48 @@ The backend infrastructure is **COMPLETE**. All HUD features are **RESTORED**. T
 
 ---
 
-## CURRENT PRIORITY: Remaining Misc Modules
+## KNOWN ISSUES
 
-**Remaining:**
-- RPC (Discord Rich Presence)
-- OneTap, WideScaffold (medium complexity)
-- PacketFly (~30k lines - skip for now)
-- ElytraBot subsystem (skip per user instructions)
+### ⚠️ Missing Watermark Logo Assets
+
+**Problem:** Watermark HUD module shows missing textures (black/pink checkerboard)
+
+**Root Cause:**
+- Logo assets downloaded from `https://github.com/GhostTypes/reaper-assets`
+- Repository no longer exists
+- Missing 6 logo files:
+  - `reaper_white.png` (Default logo)
+  - `icon_beams-min.png` (Beams design)
+  - `icon_colorsplash-min.png` (Colorsplash design)
+  - `icon_galaxy_1-min.png` (Galaxy design)
+  - `icon_purple_galaxy-min.png` (PurpleGalaxy design)
+  - `icon_red-min.png` (RedGalaxy design)
+
+**Solution:**
+1. Track down original logo assets from reaper-1.19.4 build/old installations
+2. Upload to MCDxAI repo (create `reaper-assets` repo or add to addon repo)
+3. Update ResourceLoaderService.java URLs to point to new location
+
+**Affected Code:**
+- `src/main/java/me/ghosttypes/reaper/util/services/ResourceLoaderService.java` (lines 46-52, 56-64)
+- `src/main/java/me/ghosttypes/reaper/modules/hud/Watermark.java`
+
+---
+
+## NEXT STEPS: Complete Misc, Then Combat
+
+**Remaining Misc Modules (3 to port):**
+- RPC (Discord Rich Presence - simple)
+- OneTap (medium complexity - uses combat utilities)
+- WideScaffold (medium complexity - uses combat utilities)
+
+**Skipping:**
+- PacketFly (~30k lines - too complex, low priority)
+- ElytraBot subsystem (per user instructions)
+
+**After Misc: Combat Modules (35+)**
+- All dependencies ready
+- All combat utilities complete
 
 ---
 
@@ -85,13 +120,14 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 
 | Metric | Count |
 |--------|-------|
-| Modules Ready | 26 |
+| Modules Ready | 26 (9 chat, 9 misc, 8 HUD) |
 | Combat Utilities | 4 (1086 lines) |
 | Services Complete | 7 |
 | Events Complete | 4 |
-| HUD Elements | 8 |
 | Mixins | 2 |
+| Total Lines Ported | ~5300+ |
 | Build Status | Passing |
+| Latest Commit | 22b3584 |
 
 ---
 
