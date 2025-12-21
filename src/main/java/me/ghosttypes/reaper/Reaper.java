@@ -62,6 +62,8 @@ public class Reaper extends MeteorAddon {
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.MultiTask());
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.AutoRespawn());
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.NoProne());
+        Modules.get().add(new me.ghosttypes.reaper.modules.misc.NoDesync());
+        Modules.get().add(new me.ghosttypes.reaper.modules.misc.ChorusPredict());
 
         // Load services
         SL.load();
