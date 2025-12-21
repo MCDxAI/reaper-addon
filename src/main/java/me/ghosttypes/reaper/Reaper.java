@@ -66,6 +66,9 @@ public class Reaper extends MeteorAddon {
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.NoProne());
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.NoDesync());
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.ChorusPredict());
+        Modules.get().add(new me.ghosttypes.reaper.modules.misc.AntiAim());
+        Modules.get().add(new me.ghosttypes.reaper.modules.misc.OldAnimations());
+        Modules.get().add(new me.ghosttypes.reaper.modules.misc.StrictMove());
 
         // Register HUD elements
         Hud.get().register(AuraSync.INFO);

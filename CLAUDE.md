@@ -435,90 +435,25 @@ This allows rendering game information in separate OS windows outside Minecraft.
 - Timer and direction utilities for precise movement
 - **NOTE**: The same/similar ElytraBot code exists in `ai_reference/meteor-rejects-v2` already ported to 1.21.11 - use as direct reference
 
-## Deleted Features to Restore
+## Deleted Features - RESTORED
 
-**CRITICAL**: In commit `72bcc034246f49fa7db15574a671088327654fb4` (July 24, 2022), a maintainer deleted 11 modules/services (823 lines, -954 lines total) instead of properly porting them to the new Meteor HUD API. These were NOT bugs - they were core features that should be restored.
+**COMPLETED** (commit `0fcd0ee`): All 9 deleted HUD features have been restored with proper 1.21.11 API.
 
-**Location**: All deleted code is preserved in `ai_reference/reaper-deleted-features/`
+### ✅ Restored Features
 
-### High Priority Restorations
+| Feature | Type | Lines | Status |
+|---------|------|-------|--------|
+| AuraSyncService | Service | 70 | ✅ Complete |
+| AuraSync | HUD Module | 101 | ✅ Complete |
+| Stats | HUD Module | 286 | ✅ Complete |
+| Watermark | HUD Module | 148 | ✅ Complete |
+| TextItems | HUD Module | 151 | ✅ Complete |
+| VisualBinds | HUD Module | 130 | ✅ Complete |
+| ModuleSpoof | HUD Module | 122 | ✅ Complete |
+| DebugHud | HUD Module | 163 | ✅ Complete |
+| Greeting | HUD Module | 77 | ✅ Complete |
 
-1. **AuraSync + AuraSyncService** (79 lines total)
-   - **What**: Synchronized RGB/chroma colors across ALL HUD elements
-   - **Why**: Unique feature that created cohesive visual theme
-   - **Integration**: CustomImage, Notifications, SpotifyHud, Stats, Watermark all used it
-   - **See**: `INTERCONNECTIONS.md` for full architecture documentation
-   - **Action**: Restore service, restore module, re-integrate into all HUD modules
-
-2. **Stats** (149 lines)
-   - **What**: Comprehensive combat and client statistics display
-   - **Features**: Kills, deaths, K/D ratio, killstreak, highscore, FPS, TPS, ping, playtime
-   - **Why**: Major feature users expect
-   - **Action**: Port to new HudElementInfo pattern, restore AuraSync integration
-
-3. **Watermark** (68 lines)
-   - **What**: Reaper logo/watermark display with 6 design variants
-   - **Designs**: Default, Beams, Colorsplash, Galaxy, PurpleGalaxy, RedGalaxy
-   - **Why**: Addon branding and identity
-   - **Action**: Port to new HudElementInfo pattern, restore AuraSync integration
-
-4. **TextItems** (95 lines)
-   - **What**: Item counter HUD for inventory tracking
-   - **Features**: Track specific items, bed counter, custom item lists
-   - **Why**: Practical utility for PvP
-   - **Action**: Port to new HudElementInfo pattern
-
-5. **VisualBinds** (82 lines)
-   - **What**: Display keybinds for all bound modules
-   - **Why**: QoL feature for users to remember their binds
-   - **Action**: Port to new HudElementInfo pattern
-
-### Medium Priority Restorations
-
-6. **ModuleSpoof** (81 lines)
-   - **What**: Display fake module list (anti-screenshot)
-   - **Why**: Privacy/security feature
-   - **Action**: Port to new HudElementInfo pattern
-
-7. **StreamerMode + StreamService** (145 lines total)
-   - **What**: Move sensitive info to external screen for streaming
-   - **Why**: Streamer-friendly feature
-   - **Dependency**: Requires external window system
-   - **Action**: Evaluate if external window system should be restored first
-
-### Low Priority Restorations
-
-8. **DebugHud** (107 lines)
-   - **What**: Developer debug info display
-   - **Action**: Port if useful for development/testing
-
-9. **Greeting** (17 lines)
-   - **What**: Time-based greeting display
-   - **Action**: Port as nice-to-have cosmetic feature
-
-### Integration Restorations Required
-
-**IMPORTANT**: The following modules were "ported" but had AuraSync integration stripped out:
-
-- **CustomImage** - Re-add AuraSync check (2 lines)
-- **Notifications** - Re-add AuraSync check (3 lines)
-- **SpotifyHud** - Re-add AuraSync check (3 lines)
-
-**Pattern to restore**:
-```java
-Color next = RAINBOW.getNext(renderer.delta);
-if (AuraSyncService.isEnabled()) next = AuraSyncService.RGB_COLOR;
-```
-
-### What NOT to Do
-
-❌ **DO NOT** skip these features like the original maintainer did
-❌ **DO NOT** strip AuraSync integration when porting HUD modules
-❌ **DO NOT** delete features instead of updating them to new APIs
-
-✅ **DO** restore ALL deleted features with proper 1.21.11 API usage
-✅ **DO** preserve AuraSync integration in all HUD modules
-✅ **DO** test each restored feature thoroughly
+**Skipped**: StreamerMode/StreamService (headless mixin issues, will integrate with WebGUI project later)
 
 ## Porting Strategy
 
@@ -605,13 +540,29 @@ Quick overview when porting modules from 1.19.4 to 1.21.11:
 - ✅ `modules/chat/BedAlerts.java` - Nearby bed holder detection
 - ✅ `modules/chat/HoleAlert.java` - Hole break detection with auto-reinforce
 
-**Misc Modules (6 ported):**
+**Misc Modules (9 ported):**
 - ✅ `modules/misc/MultiTask.java` - Multi-tasking utility
 - ✅ `modules/misc/AutoRespawn.java` - Auto-respawn on death
 - ✅ `modules/misc/NoProne.java` - Prevent prone state
 - ✅ `modules/misc/ConfigTweaker.java` - Config utilities
 - ✅ `modules/misc/NoDesync.java` - Ghost block prevention
 - ✅ `modules/misc/ChorusPredict.java` - Chorus teleport prediction
+- ✅ `modules/misc/AntiAim.java` - Anti-aim rotation to confuse opponents
+- ✅ `modules/misc/OldAnimations.java` - 1.8-style hit animations
+- ✅ `modules/misc/StrictMove.java` - Lag-back mitigation
+
+**HUD Modules (9/9 Complete):**
+- ✅ `modules/hud/AuraSync.java` - RGB sync control element
+- ✅ `modules/hud/Stats.java` - Combat/client statistics
+- ✅ `modules/hud/Watermark.java` - Logo with 6 designs
+- ✅ `modules/hud/TextItems.java` - Inventory item counter
+- ✅ `modules/hud/VisualBinds.java` - Keybind display
+- ✅ `modules/hud/ModuleSpoof.java` - Fake module list
+- ✅ `modules/hud/DebugHud.java` - Developer debug info
+- ✅ `modules/hud/Greeting.java` - Time-based greeting
+
+**Services:**
+- ✅ `util/services/AuraSyncService.java` - RGB sync service
 
 **Build System:**
 - ✅ Gradle 9.2.0 configured
@@ -621,40 +572,24 @@ Quick overview when porting modules from 1.19.4 to 1.21.11:
 - ✅ Access widener for sendSequencedPacket
 - ✅ All dependencies for 1.21.11
 
-### 🚧 Current Priority: Restore Deleted Features
+### 🚧 Current Priority: Remaining Misc Modules
 
-**Skipping:** StreamerMode, StreamService (headless mixin causes errors, will integrate with WebGUI later)
-
-| Feature | Type | Status |
-|---------|------|--------|
-| AuraSyncService | Service | PENDING |
-| AuraSync | HUD Module | PENDING |
-| Stats | HUD Module | PENDING |
-| Watermark | HUD Module | PENDING |
-| TextItems | HUD Module | PENDING |
-| VisualBinds | HUD Module | PENDING |
-| ModuleSpoof | HUD Module | PENDING |
-| DebugHud | HUD Module | PENDING |
-| Greeting | HUD Module | PENDING |
-
-### 🔜 After Deleted Features
-
-**Remaining Misc Modules (7):**
-- AntiAim, OldAnimations, RPC, StrictMove (simple)
+**Remaining Misc Modules (3):**
+- RPC (Discord Rich Presence)
 - OneTap, WideScaffold (medium complexity)
 - PacketFly (~30k lines - skip for now)
 - ElytraBot subsystem (skip per user instructions)
 
 **Combat Modules (35+):**
-- All dependencies ready - can begin after deleted features
+- All dependencies ready - can begin after misc modules
 
 ### 📊 Statistics
 
-- **Completed:** 40+ files
-- **Total Lines Ported:** ~3600+ lines
-- **Modules Ready:** 14 (9 chat, 5 misc)
+- **Completed:** 55+ files
+- **Total Lines Ported:** ~5300+ lines
+- **Modules Ready:** 26 (9 chat, 9 misc, 8 HUD)
 - **Combat Utilities:** 4 (1086 lines)
-- **Build Status:** ✅ Working (latest: 054260c)
+- **Build Status:** ✅ Working
 
 ## File Structure Notes
 
