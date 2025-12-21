@@ -16,6 +16,7 @@ public class Reaper extends MeteorAddon {
     public static final String MOD_ID = "reaper";
     public static final ModMetadata MOD_META;
     public static final String VERSION;
+    public static final String INVITE_LINK = "https://discord.gg/RT5JFMZxvF";
 
     static {
         MOD_META = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow().getMetadata();
