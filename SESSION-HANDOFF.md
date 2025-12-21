@@ -17,8 +17,8 @@
    - ✅ NotificationManager.java - ALREADY PORTED
    - ✅ GlobalManager.java - STUB CREATED (needs full implementation)
    - ⏳ ResourceLoaderService.java - Asset downloading system
-   - ⏳ SpotifyService.java - STUB CREATED (needs full implementation)
    - ⏳ SL.java (Service Loader) - Service initialization system
+   - ⚠️ SpotifyService.java - OPTIONAL/LOW PRIORITY (stub exists, not required)
 
 2. **Events System** (ai_reference/reaper-1.19.4/src/main/java/me/ghosttypes/reaper/events/)
    - ✅ InteractEvent.java - ALREADY PORTED
@@ -74,7 +74,7 @@
 
 **Stubs Created (2 files):**
 - util/player/Stats.java - Combat statistics (stub - needs full impl)
-- util/services/SpotifyService.java - Spotify integration (stub - needs full impl)
+- util/services/SpotifyService.java - Spotify integration (stub - optional/low priority)
 
 **Modules Ported (5 files):**
 - modules/chat/NotificationSettings.java - User notification settings
@@ -196,7 +196,7 @@ src/main/java/me/ghosttypes/reaper/
     ├── services/
     │   ├── GlobalManager.java (stub - needs full impl)
     │   ├── NotificationManager.java
-    │   ├── SpotifyService.java (stub)
+    │   ├── SpotifyService.java (stub - optional/low priority)
     │   └── TL.java
     └── world/
         └── PlayerHelper.java
@@ -372,12 +372,7 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
    - Implement death entry cleanup
    - Full death tracking system
 
-3. Complete SpotifyService.java
-   - Media state tracking
-   - Track/artist info
-   - Integration with Formatter placeholders
-
-4. Port SL.java (Service Loader)
+3. Port SL.java (Service Loader)
    - Service initialization system
    - Replaces manual initialization
    - Coordinates all services
@@ -472,12 +467,14 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 **Primary Goal:** Complete backend infrastructure (services, events, mixins)
 
 **Success Criteria:**
-- [ ] All services ported and functional
+- [ ] All critical services ported and functional (GlobalManager, ResourceLoaderService, SL)
 - [ ] Core events ported
 - [ ] Essential mixins ported
 - [ ] Critical utilities completed (Interactions, RotationHelper, BlockHelper)
 - [ ] Build still passing
 - [ ] Services integrate properly
+
+**Note:** SpotifyService is optional/low priority and not required for success criteria.
 
 **Stretch Goal:** Start porting simple modules that depend on the new backend
 

@@ -3,6 +3,8 @@ package me.ghosttypes.reaper.util.services;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import me.ghosttypes.reaper.util.misc.MathUtil;
+import meteordevelopment.meteorclient.events.world.TickEvent;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 
@@ -13,7 +15,6 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 /**
  * Global state manager for death tracking and auto-EZ
- * TODO: Full implementation with event handlers when services are ported
  */
 public class GlobalManager {
     public static ArrayList<DeathEntry> deathEntries = new ArrayList<>();
@@ -49,6 +50,17 @@ public class GlobalManager {
         deathEntries.add(new DeathEntry(player, pops, pos));
         if (deaths.containsKey(u)) deaths.put(u, deaths.getInt(u) + 1);
         else deaths.put(u, 1);
+    }
+
+    @EventHandler
+    public void onTick(TickEvent.Post event) {
+        ArrayList<DeathEntry> toRemove = new ArrayList<>();
+        for (DeathEntry entry : deathEntries) {
+            if (entry.getTime() + 2500 < System.currentTimeMillis()) {
+                toRemove.add(entry); // Remove entries older than 2.5 seconds
+            }
+        }
+        deathEntries.removeIf(toRemove::contains);
     }
 
     public static class DeathEntry {
