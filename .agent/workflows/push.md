@@ -44,7 +44,7 @@ You are creating a commit for the user. Follow these steps EXACTLY:
    )"
    ```
    
-   **IMPORTANT**: Add "Co-Authored by: Gemini 3 <gemini-cli-agent@google.com>" as the final line to your commit message
+   **IMPORTANT**: Add "Co-Authored-By: Gemini 3 <gemini-cli-agent@google.com>" as the final line to your commit message
 
 8. **After successful commit**:
    - Run `git push` to push the commit to the remote repository
