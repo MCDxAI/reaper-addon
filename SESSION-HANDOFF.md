@@ -1,14 +1,14 @@
 # Reaper Addon Port - Session Handoff Document
 
-**Date:** 2025-12-21
+**Date:** 2025-12-21 (Updated)
 **Session Type:** Autonomous Porting Session
-**Status:** ✅ Backend Complete, Chat Modules Complete
+**Status:** ✅ Backend Complete, All Priority Utilities Complete
 
 ---
 
 ## 🎯 CURRENT STATE SUMMARY
 
-The backend infrastructure is **COMPLETE**. All chat modules are **COMPLETE**. The addon builds successfully and has 11 functional modules.
+The backend infrastructure is **COMPLETE**. All priority utilities are **COMPLETE**. The addon builds successfully and has 11 functional modules with full combat utility support ready.
 
 ### What's Working Now
 
@@ -19,84 +19,52 @@ The backend infrastructure is **COMPLETE**. All chat modules are **COMPLETE**. T
 **Infrastructure Complete:**
 - Services: TL, SL, NotificationManager, GlobalManager, ResourceLoaderService
 - Events: DeathEvent, InteractEvent, UpdateHeldItemEvent, CancellablePlayerMoveEvent
-- Utilities: MathUtil, Formatter, MessageUtil, PlayerHelper, RotationHelper, Interactions (~380 lines), Stats
+- Utilities: MathUtil, Formatter, MessageUtil, PlayerHelper, RotationHelper, Interactions, Stats
 
-**Build Status:** ✅ Working (Gradle 9.2.0, Java 21, MC 1.21.11)
+**Combat Utilities Complete (NEW):**
+- BlockHelper.java (~466 lines) - Block placement, hole detection, item lists
+- CombatHelper.java (~230 lines) - Player state checks, hole finding, mining
+- DamageCalculator.java (~230 lines) - Bed/anchor damage calculations
+- PacketManager.java (~160 lines) - Packet sending for combat operations
+
+**Build System:**
+- ✅ Gradle 9.2.0, Java 21, MC 1.21.11
+- ✅ Access widener added for sendSequencedPacket
 
 ---
 
-## ✅ Completed This Session
+## ✅ Completed This Session (Autonomous)
 
-### Services Ported
-| File | Status | Notes |
-|------|--------|-------|
-| TL.java | ✅ | Thread pool manager |
-| SL.java | ✅ | Service loader initialization |
-| NotificationManager.java | ✅ | Notification queue with auto-expiry |
-| GlobalManager.java | ✅ | Death tracking, auto-EZ support |
-| ResourceLoaderService.java | ✅ | Asset downloading with 1.21.11 API |
-| SpotifyService.java | ✅ | Stub exists (optional feature) |
+### Priority Utilities Ported
 
-### Events Ported
-| File | Status | Notes |
-|------|--------|-------|
-| DeathEvent.java | ✅ | Player death detection |
-| InteractEvent.java | ✅ | Interaction tracking |
-| UpdateHeldItemEvent.java | ✅ | Item switch detection |
-| CancellablePlayerMoveEvent.java | ✅ | Movement control (for ElytraBot) |
+| File | Status | Lines | Key Changes |
+|------|--------|-------|-------------|
+| BlockHelper.java | ✅ | ~466 | `getMaterial().isReplaceable()` → `isReplaceable()`, Entity.getPos() fix, new 1.21 items (cherry, bamboo planks) |
+| CombatHelper.java | ✅ | ~230 | `instanceof PickaxeItem` → `ItemTags.PICKAXES`, PacketManager.swingHand → direct packet |
+| DamageCalculator.java | ✅ | ~230 | DamageUtils moved from `utils.player` → `utils.entity` |
+| PacketManager.java | ✅ | ~160 | `PlayerInteractBlockC2SPacket` now uses `sendSequencedPacket`, added access widener |
 
-### Utilities Ported
-| File | Status | Lines | Notes |
-|------|--------|-------|-------|
-| Interactions.java | ✅ | ~380 | Major 1.21.11 API updates, includes isInHole(), isMoving(), isBurrowed() |
-| RotationHelper.java | ✅ | ~100 | Server-side rotation management |
-| Stats.java | ✅ | ~80 | Combat/client statistics tracking |
-| MathUtil.java | ✅ | ~60 | Math utilities |
-| Formatter.java | ✅ | ~150 | Placeholders, colors, emotes |
-| MessageUtil.java | ✅ | ~130 | Chat message queue |
-| PlayerHelper.java | ✅ | ~50 | Player utilities |
+### Build System Updates
 
-### Chat Modules Ported
-| Module | Status | Description |
-|--------|--------|-------------|
-| NotificationSettings | ✅ | User notification preferences |
-| AutoLogin | ✅ | Auto /login authentication |
-| Welcomer | ✅ | Join/leave messages |
-| ArmorAlert | ✅ | Low armor durability alerts |
-| PopCounter | ✅ | Totem pop tracking with death alerts |
-| AutoEZ | ✅ | Kill messages with placeholders |
-| ChatTweaks | ✅ | Custom prefix, emotes, chroma |
-| BedAlerts | ✅ | Nearby bed holder detection |
-
-### Misc Modules Ported
-| Module | Status | Description |
-|--------|--------|-------------|
-| MultiTask | ✅ | Eat while mining |
-| AutoRespawn | ✅ | Auto respawn + rekit |
-| NoProne | ✅ | Prevent prone position |
+| File | Change |
+|------|--------|
+| build.gradle.kts | Added `loom { accessWidenerPath = ... }` |
+| fabric.mod.json | Added `"accessWidener": "reaper.accesswidener"` |
+| reaper.accesswidener | NEW - Exposes `sendSequencedPacket` for combat modules |
 
 ---
 
 ## 🚧 NEXT SESSION PRIORITIES
 
-### Phase 1: Remaining Utilities (Blocking for Combat Modules)
-
-| File | Priority | Lines | Notes |
-|------|----------|-------|-------|
-| BlockHelper.java | HIGH | ~600 | Block placement - needed by HoleAlert, combat modules |
-| CombatHelper.java | HIGH | ~300 | Combat calculations - needed by combat modules |
-| DamageCalculator.java | MEDIUM | ~200 | Damage prediction |
-| PacketManager.java | MEDIUM | ~400 | Packet handling |
-
-### Phase 2: Remaining Chat Modules
+### Phase 1: Remaining Chat Modules
 
 | Module | Blocker | Notes |
 |--------|---------|-------|
-| HoleAlert | BlockHelper | Hole break detection + reinforce |
+| HoleAlert | ✅ BlockHelper ready | Hole break detection + reinforce - CAN BE PORTED NOW |
 
-### Phase 3: More Misc Modules
+### Phase 2: Simple Misc Modules
 
-Simple modules that can be ported now:
+These can be ported now:
 - RPC.java - Discord Rich Presence
 - AntiAim.java - Anti-aim utility
 - ChorusPredict.java - Chorus fruit prediction
@@ -104,17 +72,21 @@ Simple modules that can be ported now:
 - OldAnimations.java - 1.7 animations
 - StrictMove.java - Movement restrictions
 
-Complex modules (need more utilities):
-- PacketFly.java (~30k lines) - Requires PacketManager
-- OneTap.java - Requires CombatHelper
-- WideScaffold.java - Requires BlockHelper
+### Phase 3: Combat Modules (35+ modules)
 
-### Phase 4: Combat Modules (35+ modules)
+All dependencies now ready:
+- ✅ BlockHelper (placement)
+- ✅ CombatHelper (calculations)
+- ✅ DamageCalculator (predictions)
+- ✅ PacketManager (packets)
 
-All combat modules require:
-- BlockHelper (for placement)
-- CombatHelper (for calculations)
-- DamageCalculator (for predictions)
+Combat modules can begin porting!
+
+### Phase 4: Complex Misc Modules
+
+- PacketFly.java (~30k lines) - ✅ PacketManager ready
+- OneTap.java - ✅ CombatHelper ready
+- WideScaffold.java - ✅ BlockHelper ready
 
 ### Phase 5: Deleted Features to Restore
 
@@ -146,10 +118,11 @@ All combat modules require:
 | `new NativeImageBackedTexture(img)` | `new NativeImageBackedTexture(null, img)` |
 | `new Identifier(...)` | `Identifier.of(...)` |
 | `MutableText.of(new LiteralTextContent(""))` | `Text.empty()` or `Text.literal("")` |
-
-### Meteor's PlayerUtils
-
-Discovered `PlayerUtils.isInHole(boolean doubles)` - used instead of custom CombatHelper implementation for now.
+| `getMaterial().isReplaceable()` | `getState(pos).isReplaceable()` |
+| `Entity.getPos()` | `new Vec3d(entity.getX(), entity.getY(), entity.getZ())` |
+| `DamageUtils` (utils.player) | `DamageUtils` (utils.entity) |
+| `new PlayerInteractBlockC2SPacket(hand, result, 0)` | `sendSequencedPacket(world, seq -> new PlayerInteractBlockC2SPacket(..., seq))` |
+| `new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, ground)` | `new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, ground, horizontalCollision)` |
 
 ---
 
@@ -157,18 +130,24 @@ Discovered `PlayerUtils.isInHole(boolean doubles)` - used instead of custom Comb
 
 | Metric | Count |
 |--------|-------|
-| Files Ported | 30+ |
-| Lines Ported | ~2500+ |
+| Files Ported | 34+ |
+| Lines Ported | ~3600+ |
 | Modules Ready | 11 |
+| Combat Utilities | 4 (1086 lines) |
 | Services Complete | 6 |
 | Events Complete | 4 |
-| Commits This Session | 7 |
+| Commits This Session | 11+ |
 
 ---
 
 ## 📝 Git History This Session
 
 ```
+f8bbf5f feat: port PacketManager utility and add access widener
+ed55ccf feat: port DamageCalculator utility for bed/anchor combat
+d63356f feat: port CombatHelper utility for PvP modules
+d8877a5 feat: port BlockHelper utility for block placement
+8c19393 docs: update SESSION-HANDOFF.md with current progress
 4fb3cf7 docs: update CLAUDE.md with comprehensive porting progress
 5bf2d54 feat: port BedAlerts module and add isInHole util
 397a849 feat: port AutoEZ and ChatTweaks chat modules
@@ -181,39 +160,41 @@ baf43dc feat: port critical utilities (Interactions, RotationHelper, Stats)
 
 ## 🎓 Tips for Next Session
 
-1. **Port BlockHelper first** - It's blocking HoleAlert and all combat modules
+1. **HoleAlert can be ported now** - BlockHelper is ready!
 
-2. **Use minecraft-dev MCP tools** for API lookups:
+2. **Combat modules can start** - All dependencies ported
+
+3. **Use minecraft-dev MCP tools** for API lookups (if working):
    ```
    mcp__minecraft-dev__search_minecraft_code(version, query, searchType, mapping)
    mcp__minecraft-dev__get_minecraft_source(version, className, mapping)
    ```
 
-3. **Check meteor-client reference** for current API patterns:
+4. **Check meteor-client reference** for current API patterns:
    - `ai_reference/meteor-client/src/main/java/`
 
-4. **Check Trouser-Streak** for 1.21.11 patterns:
+5. **Check Trouser-Streak** for 1.21.11 patterns:
    - Uses `getEquippedStack()` for armor
    - Uses `ItemTags` for tool type checking
 
-5. **Build after each file** to catch API issues early
+6. **Build after each file** to catch API issues early
 
-6. **Push frequently** for checkpoints
+7. **Push frequently** for checkpoints
 
 ---
 
 ## 🔮 Estimated Remaining Work
 
-| Category | Files | Est. Lines | Complexity |
-|----------|-------|------------|------------|
-| Remaining Utilities | 4 | ~1500 | HIGH |
-| Remaining Chat | 1 | ~160 | MEDIUM |
-| Simple Misc | 6 | ~600 | LOW |
-| Complex Misc | 3 | ~35000 | VERY HIGH |
-| Combat Modules | 35+ | ~15000 | VERY HIGH |
-| Deleted Features | 9 | ~800 | MEDIUM |
+| Category | Files | Est. Lines | Status |
+|----------|-------|------------|--------|
+| ~~Priority Utilities~~ | ~~4~~ | ~~1500~~ | ✅ DONE |
+| Remaining Chat | 1 | ~160 | Ready to port |
+| Simple Misc | 6 | ~600 | Ready to port |
+| Complex Misc | 3 | ~35000 | Dependencies ready |
+| Combat Modules | 35+ | ~15000 | Dependencies ready |
+| Deleted Features | 9 | ~800 | Need HUD API research |
 
-**Total remaining:** ~50,000+ lines (mostly complex combat modules)
+**Combat modules are now unblocked!**
 
 ---
 
