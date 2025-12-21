@@ -558,23 +558,52 @@ Quick overview when porting modules from 1.19.4 to 1.21.11:
 
 ## Current Porting Progress
 
-**Last Updated:** 2025-12-20
+**Last Updated:** 2025-12-21
 
-### ✅ Completed (Phase 1-3)
+### ✅ Completed (Phase 1-4)
 
 **Utilities (Phase 1-2):**
 - ✅ `util/misc/MathUtil.java` - Math utilities with 1.21.11 API updates
 - ✅ `util/misc/SystemTimer.java` - Timer utility
 - ✅ `util/misc/Task.java` - Single-execution task wrapper
 - ✅ `util/misc/AnglePos.java` - Position with yaw/pitch wrapper
+- ✅ `util/misc/Formatter.java` - String formatting with placeholders
+- ✅ `util/misc/MessageUtil.java` - Chat message utilities
 - ✅ `util/os/OSUtil.java` - OS detection and message boxes
 - ✅ `util/os/FileHelper.java` - File operations and HTTP downloads
+- ✅ `util/world/PlayerHelper.java` - Player state utilities
+- ✅ `util/world/RotationHelper.java` - Rotation management
+- ✅ `util/player/Interactions.java` - Player interactions (~360 lines, major 1.21.11 API updates)
+- ✅ `util/player/Stats.java` - Combat/client statistics tracking
 
 **Infrastructure (Phase 3):**
 - ✅ `util/services/TL.java` - Thread pool manager for async operations
+- ✅ `util/services/SL.java` - Service loader initialization
 - ✅ `util/services/NotificationManager.java` - Notification queue with auto-expiry
-- ✅ `modules/chat/NotificationSettings.java` - User-configurable notification settings
+- ✅ `util/services/GlobalManager.java` - Death tracking and auto-EZ support
+- ✅ `util/services/ResourceLoaderService.java` - Asset downloading with 1.21.11 API
 - ✅ `util/misc/ReaperModule.java` - Base class that routes module messages to notifications
+
+**Events:**
+- ✅ `events/DeathEvent.java` - Player death detection
+- ✅ `events/InteractEvent.java` - Interaction tracking
+- ✅ `events/UpdateHeldItemEvent.java` - Item switch detection
+- ✅ `events/CancellablePlayerMoveEvent.java` - Movement control
+
+**Chat Modules (Phase 4):**
+- ✅ `modules/chat/NotificationSettings.java` - User-configurable notification settings
+- ✅ `modules/chat/AutoLogin.java` - Auto-login with password
+- ✅ `modules/chat/Welcomer.java` - Welcome messages for players
+- ✅ `modules/chat/ArmorAlert.java` - Armor durability alerts
+- ✅ `modules/chat/PopCounter.java` - Totem pop tracking
+- ✅ `modules/chat/AutoEZ.java` - Kill messages with placeholders
+- ✅ `modules/chat/ChatTweaks.java` - Custom prefix, emotes, chroma
+- ✅ `modules/chat/BedAlerts.java` - Nearby bed holder detection
+
+**Misc Modules:**
+- ✅ `modules/misc/MultiTask.java` - Multi-tasking utility
+- ✅ `modules/misc/AutoRespawn.java` - Auto-respawn on death
+- ✅ `modules/misc/NoProne.java` - Prevent prone state
 
 **Build System:**
 - ✅ Gradle 9.2.0 configured
@@ -586,38 +615,37 @@ Quick overview when porting modules from 1.19.4 to 1.21.11:
 ### 🚧 Next Steps
 
 **Remaining Utilities:**
-- `util/misc/MessageUtil.java` - Chat message utilities (depends on TL ✅)
-- `util/misc/Formatter.java` - String formatting with placeholders
-- `util/world/PlayerHelper.java` - Player state utilities
-- `util/world/RotationHelper.java` - Rotation management
-- `util/world/BlockHelper.java` - Block placement utilities
+- `util/world/BlockHelper.java` - Block placement utilities (complex, many dependencies)
 - `util/combat/CombatHelper.java` - Combat calculations
 - `util/combat/DamageCalculator.java` - Damage prediction
+- `util/network/PacketManager.java` - Packet handling
+
+**Remaining Chat Modules:**
+- `modules/chat/HoleAlert.java` - Requires BlockHelper
 
 **Simple Modules (Recommended Next):**
-- Chat modules: AutoLogin, Welcomer, ChatTweaks, AutoEZ, PopCounter
-- Misc modules: AutoRespawn, MultiTask, RPC, ConfigTweaker
+- Misc modules: RPC, ConfigTweaker, PacketFly
+- Render modules: Simple ESP modules
 
 **Complex Systems (Later):**
 - Combat modules (35+ modules extend ReaperModule)
 - HUD modules (CustomImage, Notifications, Killfeed, SpotifyHud)
 - Render modules (ExternalHUD, ReaperHoleESP)
 - ElytraBot subsystem (reference: meteor-rejects-v2)
-- Services (ResourceLoaderService, GlobalManager)
 
 **Deleted Features to Restore:**
 - AuraSync + AuraSyncService (RGB sync system)
-- Stats module (combat/client statistics)
+- Stats HUD module (combat/client statistics display)
 - Watermark (branding with 6 design variants)
 - TextItems, VisualBinds, ModuleSpoof, StreamerMode, DebugHud, Greeting
 
 ### 📊 Statistics
 
-- **Completed:** 10 files (6 utilities, 4 infrastructure)
-- **Total Lines Ported:** ~600 lines
-- **Modules Ready:** 1 (NotificationSettings)
+- **Completed:** 30+ files (12 utilities, 6 infrastructure, 4 events, 11 modules)
+- **Total Lines Ported:** ~2500+ lines
+- **Modules Ready:** 11 (8 chat, 3 misc)
 - **Base Classes Ready:** ReaperModule (enables 35+ modules)
-- **Build Status:** ✅ Working (commits: 36bf39e, 083af17)
+- **Build Status:** ✅ Working (latest: 5bf2d54)
 
 ## File Structure Notes
 
