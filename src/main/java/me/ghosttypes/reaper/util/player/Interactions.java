@@ -355,10 +355,26 @@ public class Interactions {
     public static String getKD() { return Stats.getKD(); }
     public static String getPlaytime() { return Stats.getPlayTime(); }
 
+    // Player state methods (uses Meteor's PlayerUtils)
+    public static boolean isInHole() {
+        return meteordevelopment.meteorclient.utils.player.PlayerUtils.isInHole(true);
+    }
+
+    public static boolean isMoving() {
+        if (mc.player == null) return false;
+        return mc.player.forwardSpeed != 0 || mc.player.sidewaysSpeed != 0;
+    }
+
+    public static boolean isBurrowed() {
+        if (mc.player == null) return false;
+        // Check if player is standing inside a solid block
+        return !mc.world.getBlockState(mc.player.getBlockPos()).isAir();
+    }
+
     // TODO: Methods requiring BlockHelper/CombatHelper/PacketManager
     // - MineInstance class (requires PacketManager, BlockHelper)
     // - getBlockBreakingSpeed (requires enchantment API changes in 1.21)
-    // - isInHole, isBurrowed, isCitied, isWebbed, isMoving, isSelfTrapped, isTopTrapped (require CombatHelper)
+    // - isCitied, isWebbed, isSelfTrapped, isTopTrapped (require CombatHelper/BlockHelper)
     // - mine methods (require PacketManager)
     // - findWool, findPlanks (require BlockHelper.wools, BlockHelper.planks)
 }
