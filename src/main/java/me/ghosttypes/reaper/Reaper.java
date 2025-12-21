@@ -51,6 +51,8 @@ public class Reaper extends MeteorAddon {
         Modules.get().add(new me.ghosttypes.reaper.modules.chat.NotificationSettings());
         Modules.get().add(new me.ghosttypes.reaper.modules.chat.AutoLogin());
         Modules.get().add(new me.ghosttypes.reaper.modules.chat.Welcomer());
+        Modules.get().add(new me.ghosttypes.reaper.modules.chat.ArmorAlert());
+        Modules.get().add(new me.ghosttypes.reaper.modules.chat.PopCounter());
 
         // Register misc modules
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.MultiTask());
