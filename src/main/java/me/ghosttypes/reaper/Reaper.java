@@ -36,9 +36,6 @@ public class Reaper extends MeteorAddon {
         // Register misc modules
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.MultiTask());
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.AutoRespawn());
-
-        // Initialize config tweaker
-        new me.ghosttypes.reaper.modules.misc.ConfigTweaker();
     }
 
     @Override
