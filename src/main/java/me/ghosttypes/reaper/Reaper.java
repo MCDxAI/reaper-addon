@@ -1,10 +1,14 @@
 package me.ghosttypes.reaper;
 
+import me.ghosttypes.reaper.gui.tabs.ReaperTab;
 import me.ghosttypes.reaper.modules.hud.*;
+import me.ghosttypes.reaper.systems.ReaperConfig;
 import me.ghosttypes.reaper.util.services.SL;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.addons.GithubRepo;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
+import meteordevelopment.meteorclient.gui.tabs.Tabs;
+import meteordevelopment.meteorclient.systems.Systems;
 import meteordevelopment.meteorclient.systems.hud.Hud;
 import meteordevelopment.meteorclient.systems.hud.HudGroup;
 import meteordevelopment.meteorclient.systems.modules.Category;
@@ -49,8 +53,13 @@ public class Reaper extends MeteorAddon {
         if (!ASSETS.exists()) ASSETS.mkdirs();
         if (!USER_ASSETS.exists()) USER_ASSETS.mkdirs();
 
+        // Register Reaper systems
+        Systems.add(new ReaperConfig());
+
+        // Register Reaper GUI tab
+        Tabs.add(new ReaperTab());
+
         // Register chat modules
-        Modules.get().add(new me.ghosttypes.reaper.modules.chat.NotificationSettings());
         Modules.get().add(new me.ghosttypes.reaper.modules.chat.AutoLogin());
         Modules.get().add(new me.ghosttypes.reaper.modules.chat.Welcomer());
         Modules.get().add(new me.ghosttypes.reaper.modules.chat.ArmorAlert());

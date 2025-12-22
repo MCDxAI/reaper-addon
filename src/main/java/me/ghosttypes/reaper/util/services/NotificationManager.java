@@ -1,7 +1,6 @@
 package me.ghosttypes.reaper.util.services;
 
-import me.ghosttypes.reaper.modules.chat.NotificationSettings;
-import meteordevelopment.meteorclient.systems.modules.Modules;
+import me.ghosttypes.reaper.systems.ReaperConfig;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -29,8 +28,8 @@ public class NotificationManager {
         for (Notification n : threadSafeNotifs) {
             if (n.text.contains(message) || n.text.equalsIgnoreCase(message)) return; // no duplicates
         }
-        NotificationSettings ns = Modules.get().get(NotificationSettings.class);
-        int displayTime = (ns != null && ns.displayTime != null) ? ns.displayTime.get() : 2;
+        ReaperConfig config = ReaperConfig.get();
+        int displayTime = (config != null && config.displayTime != null) ? config.displayTime.get() : 2;
         notifications.add(new Notification(message, displayTime));
     }
 
