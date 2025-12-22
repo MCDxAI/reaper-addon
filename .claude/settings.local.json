@@ -14,7 +14,10 @@
       "mcp__code-search-mcp__search_text",
       "mcp__minecraft-dev__search_minecraft_code",
       "mcp__minecraft-dev__get_minecraft_source",
-      "Bash(ren:*)"
+      "Bash(ren:*)",
+      "Skill(minecraft-fabric-dev)",
+      "mcp__code-search-mcp__search_symbols",
+      "Bash(./gradlew dependencies:*)"
     ]
   }
 }

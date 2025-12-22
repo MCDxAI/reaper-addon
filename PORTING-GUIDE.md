@@ -299,7 +299,234 @@ new Bootstrap().group(NetworkingBackend.remote(false).getEventLoopGroup())
 
 ## Phase 3: Additional Breaking Changes (1.19.4 → 1.21.x)
 
-These are changes that occurred across the major version jump. **This list is incomplete** - you'll discover more during porting.
+These are changes that occurred across the major version jump. **Documented from actual porting experience.**
+
+### 1. PlayerInventory Direct Field Access Removed
+
+**Old (1.19.4):**
+```java
+mc.player.getInventory().selectedSlot = slot;
+int prevSlot = mc.player.getInventory().selectedSlot;
+```
+
+**New (1.21.11):**
+```java
+InvUtils.swap(slot, false);  // Swap to slot
+// For temporary swaps:
+InvUtils.swap(slot, false);
+// ... do work ...
+InvUtils.swapBack();  // Returns to previous slot
+```
+
+**Reason:** `selectedSlot` field is now private. Use Meteor's InvUtils for slot management.
+
+**Affected Modules:** AntiSurround, QuickMend, and any module that manually swaps hotbar slots.
+
+### 2. ClientPlayerInteractionManagerAccessor Mixin Methods
+
+**Old (1.19.4):**
+```java
+import meteordevelopment.meteorclient.mixin.ClientPlayerInteractionManagerAccessor;
+
+float progress = ((ClientPlayerInteractionManagerAccessor) mc.interactionManager).getBreakingProgress();
+BlockPos pos = ((ClientPlayerInteractionManagerAccessor) mc.interactionManager).getCurrentBreakingBlockPos();
+```
+
+**New (1.21.11):**
+```java
+import meteordevelopment.meteorclient.mixin.ClientPlayerInteractionManagerAccessor;
+
+float progress = ((ClientPlayerInteractionManagerAccessor) mc.interactionManager).meteor$getBreakingProgress();
+BlockPos pos = ((ClientPlayerInteractionManagerAccessor) mc.interactionManager).meteor$getCurrentBreakingBlockPos();
+```
+
+**Reason:** Meteor Client now prefixes all mixin accessor methods with `meteor$` to avoid conflicts.
+
+**Affected Modules:** AntiSurround, SpeedMine, AutoMine, and any module tracking block breaking.
+
+### 3. Entity Position API Changes
+
+**Old (1.19.4):**
+```java
+Vec3d pos = entity.getPos();
+Vec3d playerPos = mc.player.getPos();
+```
+
+**New (1.21.11):**
+```java
+Vec3d pos = new Vec3d(entity.getX(), entity.getY(), entity.getZ());
+Vec3d playerPos = new Vec3d(mc.player.getX(), mc.player.getY(), mc.player.getZ());
+```
+
+**Reason:** `Entity.getPos()` method was removed. Must construct Vec3d from individual coordinates.
+
+**Affected Modules:** AntiSurround, TargetStrafe, and any module using entity positions.
+
+### 4. Fall Flying (Elytra) Detection
+
+**Old (1.19.4):**
+```java
+if (mc.player.isFallFlying()) {
+    // Player is gliding with elytra
+}
+```
+
+**New (1.21.11):**
+```java
+if (mc.player.isGliding()) {
+    // Player is gliding with elytra
+}
+```
+
+**Reason:** Method renamed from `isFallFlying()` to `isGliding()` for clarity.
+
+**Affected Modules:** ReaperLongJump, ElytraFly, and any module checking elytra state.
+
+### 5. Entity Step Height Management
+
+**Old (1.19.4):**
+```java
+mc.player.setStepHeight(1.0f);  // Allow stepping up full blocks
+mc.player.setStepHeight(0.6f);  // Reset to default
+```
+
+**New (1.21.11):**
+```java
+// Step height is now managed internally by the entity
+// No direct setter available - entity handles it automatically
+```
+
+**Reason:** Step height is now controlled by entity state and cannot be directly modified.
+
+**Affected Modules:** ReaperLongJump, Step, and movement modules that modified step height.
+
+### 6. Player Input Movement Values
+
+**Old (1.19.4):**
+```java
+double moveForward = mc.player.input.movementForward;
+double moveStrafe = mc.player.input.movementSideways;
+boolean jumping = mc.player.input.jumping;
+```
+
+**New (1.21.11):**
+```java
+import net.minecraft.util.math.Vec2f;
+
+// Movement input
+Vec2f movement = mc.player.input.getMovementInput();
+double moveForward = movement.y;  // Forward/backward
+double moveStrafe = movement.x;   // Left/right
+
+// Jumping state
+boolean jumping = mc.player.input.playerInput.jump();
+```
+
+**Reason:** Input fields are now private. Use `getMovementInput()` for movement (returns Vec2f with x=strafe, y=forward) and `playerInput.jump()` for jump state.
+
+**Affected Modules:** ReaperLongJump, TargetStrafe, Speed, and movement-based modules.
+
+### 7. Armor Slot Access
+
+**Old (1.19.4):**
+```java
+// Iterate armor slots
+for (ItemStack armorPiece : mc.player.getArmorItems()) {
+    // Process armor
+}
+
+// Direct access
+ItemStack helmet = mc.player.getInventory().armor.get(3);
+```
+
+**New (1.21.11):**
+```java
+import net.minecraft.entity.EquipmentSlot;
+
+// Access specific armor slots
+ItemStack helmet = mc.player.getEquippedStack(EquipmentSlot.HEAD);
+ItemStack chest = mc.player.getEquippedStack(EquipmentSlot.CHEST);
+ItemStack legs = mc.player.getEquippedStack(EquipmentSlot.LEGS);
+ItemStack boots = mc.player.getEquippedStack(EquipmentSlot.FEET);
+
+// Iterate armor slots
+for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+    ItemStack armor = mc.player.getEquippedStack(slot);
+    // Process armor
+}
+```
+
+**Reason:** Direct armor list access removed. Use `getEquippedStack(EquipmentSlot)` instead.
+
+**Affected Modules:** SelfTrapPlus, AutoTotem, ArmorNotifier, and armor-related modules.
+
+### 8. Player Name from GameProfile
+
+**Old (1.19.4):**
+```java
+String name = player.getGameProfile().getName();
+```
+
+**New (1.21.11):**
+```java
+String name = player.getName().getString();
+```
+
+**Reason:** GameProfile API changed. Use `getName().getString()` on the entity directly.
+
+**Affected Modules:** AntiSurround, PopCounter, and modules displaying player names.
+
+### 9. Entity Previous Position Tracking
+
+**Old (1.19.4):**
+```java
+double prevY = mc.player.prevY;
+```
+
+**New (1.21.11):**
+```java
+double prevY = mc.player.lastY;
+```
+
+**Reason:** Field renamed from `prevY` to `lastY` (also applies to prevX, prevZ → lastX, lastZ).
+
+**Affected Modules:** ReaperSurround, NoFall, and modules tracking position changes.
+
+### 10. WorldRendererAccessor Mixin Methods
+
+**Old (1.19.4):**
+```java
+import meteordevelopment.meteorclient.mixin.WorldRendererAccessor;
+
+Map<Integer, BlockBreakingInfo> breakingInfos = ((WorldRendererAccessor) mc.worldRenderer).getBlockBreakingInfos();
+```
+
+**New (1.21.11):**
+```java
+import meteordevelopment.meteorclient.mixin.WorldRendererAccessor;
+
+Map<Integer, BlockBreakingInfo> breakingInfos = ((WorldRendererAccessor) mc.worldRenderer).meteor$getBlockBreakingInfos();
+```
+
+**Reason:** Meteor Client now prefixes all mixin accessor methods with `meteor$`.
+
+**Affected Modules:** ReaperSurround, AutoCity, and modules tracking block breaking.
+
+### 11. Block State Replaceability Check
+
+**Old (1.19.4):**
+```java
+boolean canPlace = BlockHelper.isReplacable(pos);  // Typo in original
+```
+
+**New (1.21.11):**
+```java
+boolean canPlace = BlockHelper.isReplaceable(pos);  // Fixed spelling
+```
+
+**Reason:** Fixed spelling from "Replacable" to "Replaceable" to match Minecraft API.
+
+**Affected Modules:** ReaperSurround and placement modules using this utility.
 
 ### Packet System Restructuring
 
