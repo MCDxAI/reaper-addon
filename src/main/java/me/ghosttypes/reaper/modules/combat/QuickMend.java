@@ -1,6 +1,6 @@
 package me.ghosttypes.reaper.modules.combat;
 
-import me.ghosttypes.reaper.modules.ML;
+import me.ghosttypes.reaper.Reaper;
 import me.ghosttypes.reaper.util.misc.ModuleHelper;
 import me.ghosttypes.reaper.util.misc.ReaperModule;
 import me.ghosttypes.reaper.util.network.PacketManager;
@@ -120,7 +120,7 @@ public class QuickMend extends ReaperModule {
     );
 
     public QuickMend() {
-        super(ML.R, "quick-mend", "Automatically repair your armor.");
+        super(Reaper.CATEGORY, "quick-mend", "Automatically repair your armor.");
     }
 
     @EventHandler

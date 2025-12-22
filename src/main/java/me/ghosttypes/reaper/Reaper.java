@@ -73,6 +73,9 @@ public class Reaper extends MeteorAddon {
         Modules.get().add(new me.ghosttypes.reaper.modules.combat.AntiSurround());
         Modules.get().add(new me.ghosttypes.reaper.modules.combat.SmartHoleFill());
         Modules.get().add(new me.ghosttypes.reaper.modules.combat.ReaperLongJump());
+        Modules.get().add(new me.ghosttypes.reaper.modules.combat.AnchorGod());
+        Modules.get().add(new me.ghosttypes.reaper.modules.combat.BedGod());
+        Modules.get().add(new me.ghosttypes.reaper.modules.combat.ReaperSurround());
 
         // Register misc modules
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.MultiTask());

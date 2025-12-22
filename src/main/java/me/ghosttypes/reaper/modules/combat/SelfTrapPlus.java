@@ -1,6 +1,6 @@
 package me.ghosttypes.reaper.modules.combat;
 
-import me.ghosttypes.reaper.modules.ML;
+import me.ghosttypes.reaper.Reaper;
 import me.ghosttypes.reaper.util.misc.ReaperModule;
 import me.ghosttypes.reaper.util.player.Interactions;
 import me.ghosttypes.reaper.util.world.BlockHelper;
@@ -80,7 +80,7 @@ public class SelfTrapPlus extends ReaperModule {
 
 
     public SelfTrapPlus(){
-        super(ML.R, "self-trap-plus", "Places obsidian around your head.");
+        super(Reaper.CATEGORY, "self-trap-plus", "Places obsidian around your head.");
     }
 
     @Override

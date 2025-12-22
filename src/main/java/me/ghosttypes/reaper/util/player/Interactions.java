@@ -17,7 +17,9 @@ import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.registry.tag.BlockTags;
 
 import java.util.UUID;
 
@@ -359,10 +361,135 @@ public class Interactions {
         return !mc.world.getBlockState(mc.player.getBlockPos()).isAir();
     }
 
-    // TODO: Methods requiring BlockHelper/CombatHelper/PacketManager
-    // - MineInstance class (requires PacketManager, BlockHelper)
-    // - getBlockBreakingSpeed (requires enchantment API changes in 1.21)
-    // - isCitied, isWebbed, isSelfTrapped, isTopTrapped (require CombatHelper/BlockHelper)
-    // - mine methods (require PacketManager)
-    // - findWool, findPlanks (require BlockHelper.wools, BlockHelper.planks)
+    // Mining utilities
+
+    /**
+     * Mining instance for tracking block-breaking progress.
+     * Used by anti-trap/anti-burrow features in combat modules.
+     */
+    public static class MineInstance {
+        private double progress = 0;
+        private BlockPos pos;
+        private boolean started;
+
+        public MineInstance(BlockPos bp) {
+            this.progress = 0;
+            this.pos = bp;
+            this.started = false;
+        }
+
+        public BlockPos getPos() { return this.pos; }
+
+        public void init() {
+            if (this.started) return;
+            FindItemResult pick = findPick();
+            if (!pick.found()) return;
+            setSlot(pick.slot(), false);
+            me.ghosttypes.reaper.util.network.PacketManager.startPacketMine(this.pos, false, false);
+            this.started = true;
+        }
+
+        public void tick() {
+            FindItemResult pick = findPick();
+            if (!pick.found()) return;
+            this.progress += getBreakDelta(pick.slot(), mc.world.getBlockState(this.pos));
+        }
+
+        public void finish() {
+            FindItemResult pick = findPick();
+            if (!pick.found()) return;
+            setSlot(pick.slot(), false);
+            me.ghosttypes.reaper.util.network.PacketManager.finishPacketMine(this.pos, true, false);
+        }
+
+        public boolean isReady() {
+            return this.progress >= 1;
+        }
+
+        public boolean isValid() {
+            if (me.ghosttypes.reaper.util.world.BlockHelper.isAir(this.pos)) return false;
+            return !(me.ghosttypes.reaper.util.world.BlockHelper.distanceTo(pos) > 4.8);
+        }
+    }
+
+    /**
+     * Calculate block breaking speed for a specific slot and block state.
+     * Uses 1.21.11 enchantment/attribute APIs.
+     */
+    public static double getBlockBreakingSpeed(int slot, net.minecraft.block.BlockState block) {
+        double speed = mc.player.getInventory().getMainStacks().get(slot).getMiningSpeedMultiplier(block);
+
+        if (speed > 1) {
+            ItemStack tool = mc.player.getInventory().getStack(slot);
+            int efficiency = meteordevelopment.meteorclient.utils.Utils.getEnchantmentLevel(tool, net.minecraft.enchantment.Enchantments.EFFICIENCY);
+            if (efficiency > 0 && !tool.isEmpty()) speed += efficiency * efficiency + 1;
+        }
+
+        if (net.minecraft.entity.effect.StatusEffectUtil.hasHaste(mc.player)) {
+            speed *= 1 + (net.minecraft.entity.effect.StatusEffectUtil.getHasteAmplifier(mc.player) + 1) * 0.2F;
+        }
+
+        if (mc.player.hasStatusEffect(net.minecraft.entity.effect.StatusEffects.MINING_FATIGUE)) {
+            float k = switch (mc.player.getStatusEffect(net.minecraft.entity.effect.StatusEffects.MINING_FATIGUE).getAmplifier()) {
+                case 0 -> 0.3F;
+                case 1 -> 0.09F;
+                case 2 -> 0.0027F;
+                default -> 8.1E-4F;
+            };
+            speed *= k;
+        }
+
+        // 1.21.11 API: Use SUBMERGED_MINING_SPEED attribute instead of hasAquaAffinity check
+        if (mc.player.isSubmergedIn(net.minecraft.registry.tag.FluidTags.WATER)) {
+            speed *= mc.player.getAttributeValue(net.minecraft.entity.attribute.EntityAttributes.SUBMERGED_MINING_SPEED);
+        }
+
+        if (!mc.player.isOnGround()) speed /= 5.0F;
+        return speed;
+    }
+
+    /**
+     * Calculate break progress delta per tick.
+     */
+    public static double getBreakDelta(int slot, net.minecraft.block.BlockState state) {
+        float hardness = state.getHardness(null, null);
+        if (hardness == -1) return 0;
+        else {
+            return getBlockBreakingSpeed(slot, state) / hardness / (!state.isToolRequired() || mc.player.getInventory().getMainStacks().get(slot).isSuitableFor(state) ? 30 : 100);
+        }
+    }
+
+    /**
+     * Start mining a block at the given position.
+     */
+    public static void mine(net.minecraft.util.math.BlockPos pos) {
+        mc.interactionManager.updateBlockBreakingProgress(pos, net.minecraft.util.math.Direction.UP);
+        me.ghosttypes.reaper.util.network.PacketManager.swingHand(false);
+    }
+
+    /**
+     * Start mining a block with a specific item.
+     */
+    public static void mine(net.minecraft.util.math.BlockPos pos, FindItemResult item) {
+        if (pos == null || !item.found() || !item.isHotbar()) return;
+        setSlot(item.slot(), false);
+        mine(pos);
+    }
+
+    /**
+     * Find wool items in hotbar for bed crafting.
+     */
+    public static FindItemResult findWool() {
+        return InvUtils.findInHotbar(itemStack -> {
+            net.minecraft.block.Block block = net.minecraft.block.Block.getBlockFromItem(itemStack.getItem());
+            return block.getDefaultState().isIn(BlockTags.WOOL);
+        });
+    }
+
+    /**
+     * Find planks items in hotbar for bed crafting.
+     */
+    public static FindItemResult findPlanks() {
+        return InvUtils.findInHotbar(itemStack -> itemStack.isIn(net.minecraft.registry.tag.ItemTags.PLANKS));
+    }
 }

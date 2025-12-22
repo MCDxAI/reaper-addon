@@ -1,6 +1,6 @@
 package me.ghosttypes.reaper.modules.combat;
 
-import me.ghosttypes.reaper.modules.ML;
+import me.ghosttypes.reaper.Reaper;
 import me.ghosttypes.reaper.util.combat.CityUtils;
 import me.ghosttypes.reaper.util.misc.ReaperModule;
 import me.ghosttypes.reaper.util.misc.Task;
@@ -154,7 +154,7 @@ public class AntiSurround extends ReaperModule {
         .build());
 
     public AntiSurround() {
-        super(ML.R, "anti-surround", "Automatically breaks target's surround.");
+        super(Reaper.CATEGORY, "anti-surround", "Automatically breaks target's surround.");
     }
 
     // State variables
