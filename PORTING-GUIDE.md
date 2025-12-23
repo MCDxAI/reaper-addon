@@ -259,6 +259,29 @@ Renderer2D.COLOR.render();  // No parameters
 
 **Affected Modules:** HUD elements, rendering modules.
 
+### 4a. HudRenderer Texture Rendering
+
+**Old (1.19.4):**
+```java
+import meteordevelopment.meteorclient.renderer.GL;
+import meteordevelopment.meteorclient.renderer.Renderer2D;
+
+GL.bindTexture(IMAGE);
+Renderer2D.TEXTURE.begin();
+Renderer2D.TEXTURE.texQuad(x, y, w, h, color);
+Renderer2D.TEXTURE.render(null);
+```
+
+**New (1.21.11):**
+```java
+// Use HudRenderer's texture method directly
+renderer.texture(x, y, w, h, IMAGE, color);
+```
+
+**Reason:** HudRenderer now provides simplified texture rendering API that handles binding and rendering internally.
+
+**Affected Modules:** CustomImage, Watermark, and HUD modules rendering textures.
+
 ### 5. GuiTheme.module() Signature
 
 **Old:**
@@ -296,6 +319,80 @@ new Bootstrap().group(NetworkingBackend.remote(false).getEventLoopGroup())
 ```
 
 **Affected Modules:** PacketFly or any module using direct network connections.
+
+### 7. NativeImageBackedTexture Constructor
+
+**Old (1.19.4):**
+```java
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
+
+NativeImage data = NativeImage.read(inputStream);
+NativeImageBackedTexture texture = new NativeImageBackedTexture(data);
+mc.getTextureManager().registerTexture(identifier, texture);
+```
+
+**New (1.21.11):**
+```java
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
+
+NativeImage data = NativeImage.read(inputStream);
+NativeImageBackedTexture texture = new NativeImageBackedTexture(() -> identifier.toString(), data);
+mc.getTextureManager().registerTexture(identifier, texture);
+```
+
+**Reason:** Constructor now requires a `Supplier<String>` parameter (typically a lambda returning the identifier string) for debugging/logging purposes.
+
+**Affected Modules:** CustomImage, ResourceLoaderService, and any code loading custom textures.
+
+### 8. MeteorToast Builder Pattern
+
+**Old (1.19.4):**
+```java
+import meteordevelopment.meteorclient.utils.render.MeteorToast;
+import net.minecraft.item.Items;
+
+MeteorToast toast = new MeteorToast(Items.TOTEM_OF_UNDYING, "Title", "Message", 2000);
+mc.getToastManager().add(toast);
+```
+
+**New (1.21.11):**
+```java
+import meteordevelopment.meteorclient.utils.render.MeteorToast;
+import net.minecraft.item.Items;
+
+MeteorToast toast = new MeteorToast.Builder("Title")
+    .icon(Items.TOTEM_OF_UNDYING)
+    .text("Message")
+    .build();
+mc.getToastManager().add(toast);
+```
+
+**Reason:** MeteorToast now uses Builder pattern for construction instead of direct constructor.
+
+**Affected Modules:** Notifications HUD, PopCounter, ArmorAlert, and any module showing toast notifications.
+
+### 9. Renderer2D.COLOR Quad Rendering in HUD
+
+**Old (1.19.4):**
+```java
+import meteordevelopment.meteorclient.renderer.Renderer2D;
+
+Renderer2D.COLOR.begin();
+Renderer2D.COLOR.quad(x, y, width, height, color);
+Renderer2D.COLOR.render(null);
+```
+
+**New (1.21.11):**
+```java
+// Use HudRenderer's quad method directly
+renderer.quad(x, y, width, height, color);
+```
+
+**Reason:** HudRenderer provides simplified quad rendering that handles begin/render internally.
+
+**Affected Modules:** Notifications HUD and HUD modules rendering colored rectangles.
 
 ## Phase 3: Additional Breaking Changes (1.19.4 → 1.21.x)
 
@@ -544,12 +641,41 @@ Entity tracking and player list management has evolved. Check Meteor Client's cu
 
 ### Setting/Config System
 
-Meteor Client's settings system may have API changes. Verify all setting types still work:
-- `BoolSetting`
-- `EnumSetting`
-- `IntSetting`
-- `DoubleSetting`
-- etc.
+**Old (1.19.4) - Module-based Settings:**
+```java
+// Settings stored in a module
+public class NotificationSettings extends ReaperModule {
+    public final Setting<Boolean> info = sgGeneral.add(...);
+    public final Setting<Boolean> warning = sgGeneral.add(...);
+}
+
+// Accessed via:
+NotificationSettings ns = Modules.get().get(NotificationSettings.class);
+if (ns.info.get()) { ... }
+```
+
+**New (1.21.11) - System-based Settings:**
+```java
+// Settings stored in a custom System
+public class ReaperConfig extends System<ReaperConfig> {
+    private final SettingGroup sgNotifications = settings.createGroup("Notifications");
+
+    public final Setting<Boolean> info = sgNotifications.add(...);
+    public final Setting<Boolean> warning = sgNotifications.add(...);
+
+    public static ReaperConfig get() {
+        return Systems.get(ReaperConfig.class);
+    }
+}
+
+// Accessed via:
+ReaperConfig config = ReaperConfig.get();
+if (config.info.get()) { ... }
+```
+
+**Reason:** Global addon settings should use Meteor's System architecture instead of dummy modules for better organization and persistence.
+
+**Affected Code:** NotificationProxy mixin, any code accessing global addon settings.
 
 ### Event System
 
@@ -560,14 +686,16 @@ Meteor's event system may have changes. Verify:
 
 ## Phase 4: Mixin Compatibility
 
-**Current Mixins in reaper.mixins.json:**
-- `MinecraftClientMixin`
-- `Bootstrap`
-- `meteor.FakePlayerMixin`
-- `meteor.MeteorBootstrap`
-- `meteor.NotificationProxy`
-- `HeldItemRendererAccessor`
-- `HeldItemRendererMixin`
+**Current Mixins in reaper.mixins.json (1.21.11):**
+- `MinecraftClientMixin` - Core client hooks
+- `HeldItemRendererAccessor` - Access held item animation fields
+- `HeldItemRendererMixin` - Fires UpdateHeldItemEvent for OldAnimations
+- `NotificationProxy` - Intercepts ChatUtils to route messages to notifications
+
+**Removed/Not Ported:**
+- `Bootstrap` - Not needed in fresh implementation
+- `meteor.FakePlayerMixin` - Check if still needed
+- `meteor.MeteorBootstrap` - Not needed (was disabled in original)
 
 **Actions Required:**
 1. Verify each mixin target class still exists with same name
@@ -817,11 +945,12 @@ The threaded pathfinding system with A* is complex. **Good news:** It's already 
 
 ### Statistics
 
-- **Files Ported:** 10 (6 utilities, 4 infrastructure)
-- **Lines of Code:** ~600
-- **Modules Registered:** 1
+- **Files Ported:** 60+
+- **Lines of Code:** ~6100+
+- **Modules Registered:** 38 (9 chat, 12 misc, 7 combat, 11 HUD)
+- **Services:** 6 (TL, SL, NotificationManager, GlobalManager, ResourceLoaderService, AuraSyncService)
 - **Build Status:** ✅ Working
-- **Last Commits:** 36bf39e, 083af17
+- **Last Updated:** 2025-12-22
 
 ## Additional Resources
 

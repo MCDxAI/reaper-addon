@@ -4,7 +4,9 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "MinecraftClientMixin",
-    "HeldItemRendererAccessor"
+    "HeldItemRendererAccessor",
+    "HeldItemRendererMixin",
+    "NotificationProxy"
   ],
   "injectors": {
     "defaultRequire": 1

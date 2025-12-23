@@ -16,6 +16,7 @@ public class SL {
         MeteorClient.EVENT_BUS.subscribe(new GlobalManager()); // subscribe GlobalManager to events
         MessageUtil.init();
         NotificationManager.init();
+        WellbeingService.init();
         Runtime.getRuntime().addShutdownHook(new Thread(TL::shutdown));
         Reaper.log("Started services (" + MathUtil.msPassed(start) + "ms)");
     }

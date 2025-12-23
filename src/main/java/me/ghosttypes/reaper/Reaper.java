@@ -27,6 +27,7 @@ public class Reaper extends MeteorAddon {
 
     // Folder structure
     public static final File FOLDER = new File(MeteorClient.FOLDER, "Reaper");
+    public static final File USER_ASSETS = new File(FOLDER, "user_assets");
 
     public static final String MOD_ID = "reaper";
     public static final ModMetadata MOD_META;
@@ -46,6 +47,7 @@ public class Reaper extends MeteorAddon {
 
         // Create folder structure
         if (!FOLDER.exists()) FOLDER.mkdirs();
+        if (!USER_ASSETS.exists()) USER_ASSETS.mkdirs();
 
         // Register Reaper systems
         Systems.add(new ReaperConfig());
@@ -84,6 +86,10 @@ public class Reaper extends MeteorAddon {
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.OneTap());
         Modules.get().add(new me.ghosttypes.reaper.modules.misc.WideScaffold());
 
+        // Register render modules
+        Modules.get().add(new me.ghosttypes.reaper.modules.render.ReaperHoleESP());
+
+
         // Register HUD elements
         Hud.get().register(AuraSync.INFO);
         Hud.get().register(Stats.INFO);
@@ -93,6 +99,9 @@ public class Reaper extends MeteorAddon {
         Hud.get().register(ModuleSpoof.INFO);
         Hud.get().register(DebugHud.INFO);
         Hud.get().register(Greeting.INFO);
+        Hud.get().register(CustomImage.INFO);
+        Hud.get().register(Killfeed.INFO);
+        Hud.get().register(Notifications.INFO);
 
         // Load services
         SL.load();

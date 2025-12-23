@@ -17,5 +17,6 @@ public class TL { // Thread Loader
         cached.shutdown();
         scheduled.shutdown();
         modules.shutdown();
+        WellbeingService.shutdown();
     }
 }
