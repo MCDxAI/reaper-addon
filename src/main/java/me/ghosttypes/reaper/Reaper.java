@@ -27,9 +27,6 @@ public class Reaper extends MeteorAddon {
 
     // Folder structure
     public static final File FOLDER = new File(MeteorClient.FOLDER, "Reaper");
-    public static final File RECORDINGS = new File(FOLDER, "recordings");
-    public static final File ASSETS = new File(FOLDER, "assets");
-    public static final File USER_ASSETS = new File(ASSETS, "user");
 
     public static final String MOD_ID = "reaper";
     public static final ModMetadata MOD_META;
@@ -49,9 +46,6 @@ public class Reaper extends MeteorAddon {
 
         // Create folder structure
         if (!FOLDER.exists()) FOLDER.mkdirs();
-        if (!RECORDINGS.exists()) RECORDINGS.mkdirs();
-        if (!ASSETS.exists()) ASSETS.mkdirs();
-        if (!USER_ASSETS.exists()) USER_ASSETS.mkdirs();
 
         // Register Reaper systems
         Systems.add(new ReaperConfig());

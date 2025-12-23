@@ -23,11 +23,10 @@ public class Stats {
     }
 
     public static String getPlayTime() {
-        long elapsed = System.currentTimeMillis() - startTime;
-        long hours = elapsed / 3600000;
-        long minutes = (elapsed % 3600000) / 60000;
-        long seconds = (elapsed % 60000) / 1000;
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        return me.ghosttypes.reaper.util.misc.MathUtil.formatDuration(
+            System.currentTimeMillis() - startTime, 
+            "HH:mm:ss"
+        );
     }
 
     public static String getKD() {

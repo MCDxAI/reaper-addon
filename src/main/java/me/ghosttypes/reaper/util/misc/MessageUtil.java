@@ -69,7 +69,7 @@ public class MessageUtil {
 
     // Message queue handling
     public static void init() {
-        TL.schedueled.scheduleAtFixedRate(MessageUtil::update, 2500, 500, TimeUnit.MILLISECONDS);
+        TL.scheduled.scheduleAtFixedRate(MessageUtil::update, 2500, 500, TimeUnit.MILLISECONDS);
     }
 
     public static void update() {

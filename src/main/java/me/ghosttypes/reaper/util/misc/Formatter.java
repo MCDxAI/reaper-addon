@@ -24,9 +24,6 @@ public class Formatter {
         return msg.replace(playerName, "");
     }
 
-    public static int randInt(int min, int max) {
-        return min + (int) (Math.random() * ((max - min) + 1));
-    }
 
     public static Color sToMC(SettingColor sc) { // SettingColor -> MeteorColor
         if (sc == null) return null;
@@ -59,7 +56,7 @@ public class Formatter {
         if (m.contains("{server}")) m = m.replace("{server}", Utils.getWorldName());
         if (m.contains("{version}")) m = m.replace("{version}", SharedConstants.getGameVersion().name());
         if (m.contains("{rversion}")) m = m.replace("{rversion}", Reaper.VERSION);
-        if (m.contains("{random}")) m = m.replace("{random}", String.valueOf(randInt(1, 9)));
+        if (m.contains("{random}")) m = m.replace("{random}", String.valueOf(random(1, 9)));
         if (m.contains("{username}")) m = m.replace("{username}", mc.getSession().getUsername());
         if (m.contains("{hp}")) m = m.replace("{hp}", String.valueOf(Math.rint(PlayerUtils.getTotalHealth())));
 

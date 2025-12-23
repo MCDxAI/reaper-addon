@@ -26,11 +26,11 @@ public class MathUtil {
         return Math.ceil(d);
     }
 
-    public static long msPassed(Long start) {
+    public static long msPassed(long start) {
         return System.currentTimeMillis() - start;
     }
 
-    public static long secondsPassed(Long start) {
+    public static long secondsPassed(long start) {
         return msToSeconds(msPassed(start));
     }
 
@@ -38,23 +38,23 @@ public class MathUtil {
         return System.currentTimeMillis();
     }
 
-    public static String timeElapsed(Long start) {
+    public static String timeElapsed(long start) {
         return formatDuration(System.currentTimeMillis() - start, "HH:mm:ss");
     }
 
-    public static String hoursElapsed(Long start) {
+    public static String hoursElapsed(long start) {
         return formatDuration(System.currentTimeMillis() - start, "HH");
     }
 
-    public static String minutesElapsed(Long start) {
+    public static String minutesElapsed(long start) {
         return formatDuration(System.currentTimeMillis() - start, "mm");
     }
 
-    public static String secondsElapsed(Long start) {
+    public static String secondsElapsed(long start) {
         return formatDuration(System.currentTimeMillis() - start, "ss");
     }
 
-    public static String millisElapsed(Long start) {
+    public static String millisElapsed(long start) {
         return Math.round(MathUtil.msPassed(start) * 100.0) / 100.0 + "ms";
     }
 
@@ -128,7 +128,7 @@ public class MathUtil {
     }
 
     // Simple duration formatter using Java standard library (replaces Apache Commons)
-    private static String formatDuration(long durationMillis, String format) {
+    public static String formatDuration(long durationMillis, String format) {
         long hours = TimeUnit.MILLISECONDS.toHours(durationMillis);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(durationMillis) % 60;
         long seconds = TimeUnit.MILLISECONDS.toSeconds(durationMillis) % 60;

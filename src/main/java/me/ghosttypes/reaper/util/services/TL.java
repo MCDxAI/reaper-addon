@@ -6,7 +6,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class TL { // Thread Loader
     public static ExecutorService cached = Executors.newCachedThreadPool();
-    public static ScheduledExecutorService schedueled = Executors.newScheduledThreadPool(10);
+    public static ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(10);
     public static ExecutorService modules = Executors.newFixedThreadPool(10);
 
     public static void init() {
@@ -15,7 +15,7 @@ public class TL { // Thread Loader
 
     public static void shutdown() {
         cached.shutdown();
-        schedueled.shutdown();
+        scheduled.shutdown();
         modules.shutdown();
     }
 }

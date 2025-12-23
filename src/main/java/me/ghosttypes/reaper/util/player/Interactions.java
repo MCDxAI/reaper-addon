@@ -343,7 +343,6 @@ public class Interactions {
     public static int getHighscore() { return Stats.highscore; }
     public static int getKillstreak() { return Stats.killStreak; }
     public static String getKD() { return Stats.getKD(); }
-    public static String getPlaytime() { return Stats.getPlayTime(); }
 
     // Player state methods (uses Meteor's PlayerUtils)
     public static boolean isInHole() {

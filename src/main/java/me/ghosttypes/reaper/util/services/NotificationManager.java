@@ -11,7 +11,7 @@ public class NotificationManager {
     public static ArrayList<Notification> threadSafeNotifs = new ArrayList<>();
 
     public static void init() {
-        TL.schedueled.scheduleAtFixedRate(NotificationManager::update, 0, 1, TimeUnit.SECONDS);
+        TL.scheduled.scheduleAtFixedRate(NotificationManager::update, 0, 1, TimeUnit.SECONDS);
     }
 
     public static void update() {
