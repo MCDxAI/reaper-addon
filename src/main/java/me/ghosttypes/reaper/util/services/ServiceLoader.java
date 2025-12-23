@@ -6,9 +6,9 @@ import me.ghosttypes.reaper.util.misc.MessageUtil;
 import meteordevelopment.meteorclient.MeteorClient;
 
 /**
- * Service Loader - Initializes all background services
+ * ServiceLoader - Initializes all background services
  */
-public class SL {
+public class ServiceLoader {
 
     public static void load() {
         long start = MathUtil.now();
@@ -17,10 +17,8 @@ public class SL {
         MessageUtil.init();
         NotificationManager.init();
         WellbeingService.init();
-        Runtime.getRuntime().addShutdownHook(new Thread(TL::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(ThreadLoader::shutdown));
         Reaper.log("Started services (" + MathUtil.msPassed(start) + "ms)");
     }
 
-    // TODO: Add RPC setup when RPC module is ported
-    // public static void setupRPC() { ... }
 }

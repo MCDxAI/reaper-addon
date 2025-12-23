@@ -3,7 +3,7 @@ package me.ghosttypes.reaper;
 import me.ghosttypes.reaper.gui.tabs.ReaperTab;
 import me.ghosttypes.reaper.modules.hud.*;
 import me.ghosttypes.reaper.systems.ReaperConfig;
-import me.ghosttypes.reaper.util.services.SL;
+import me.ghosttypes.reaper.util.services.ServiceLoader;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.addons.GithubRepo;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
@@ -28,6 +28,7 @@ public class Reaper extends MeteorAddon {
     // Folder structure
     public static final File FOLDER = new File(MeteorClient.FOLDER, "Reaper");
     public static final File USER_ASSETS = new File(FOLDER, "user_assets");
+    public static final File RECORDINGS = new File(FOLDER, "recordings");
 
     public static final String MOD_ID = "reaper";
     public static final ModMetadata MOD_META;
@@ -48,6 +49,7 @@ public class Reaper extends MeteorAddon {
         // Create folder structure
         if (!FOLDER.exists()) FOLDER.mkdirs();
         if (!USER_ASSETS.exists()) USER_ASSETS.mkdirs();
+        if (!RECORDINGS.exists()) RECORDINGS.mkdirs();
 
         // Register Reaper systems
         Systems.add(new ReaperConfig());
@@ -104,7 +106,7 @@ public class Reaper extends MeteorAddon {
         Hud.get().register(Notifications.INFO);
 
         // Load services
-        SL.load();
+        ServiceLoader.load();
     }
 
     public static void log(String message) {

@@ -1,6 +1,6 @@
 package me.ghosttypes.reaper.util.misc;
 
-import me.ghosttypes.reaper.util.services.TL;
+import me.ghosttypes.reaper.util.services.ThreadLoader;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.Utils;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
@@ -44,7 +44,7 @@ public class MessageUtil {
     }
 
     public static void sendEzMessage(String target, String ezMessage, long delay, boolean sendDM) {
-        TL.cached.execute(() -> {
+        ThreadLoader.cached.execute(() -> {
             pendingEZ.add(target); // "lock" the name so no duplicates can be sent
             try {Thread.sleep(delay);} catch (Exception ignored) {}
             sendClientMessage(ezMessage);
@@ -54,14 +54,14 @@ public class MessageUtil {
     }
 
     public static void sendDelayedMessage(String msg, long delay) {
-        TL.cached.execute(() -> {
+        ThreadLoader.cached.execute(() -> {
             try {Thread.sleep(delay);} catch (Exception ignored) {}
             sendClientMessage(msg);
         });
     }
 
     public static void sendDelayedDM(String target, String msg, long delay, boolean stripName) {
-        TL.cached.execute(() -> {
+        ThreadLoader.cached.execute(() -> {
             try {Thread.sleep(delay);} catch (Exception ignored) {}
             sendDM(target, msg, stripName);
         });
@@ -69,7 +69,7 @@ public class MessageUtil {
 
     // Message queue handling
     public static void init() {
-        TL.scheduled.scheduleAtFixedRate(MessageUtil::update, 2500, 500, TimeUnit.MILLISECONDS);
+        ThreadLoader.scheduled.scheduleAtFixedRate(MessageUtil::update, 2500, 500, TimeUnit.MILLISECONDS);
     }
 
     public static void update() {

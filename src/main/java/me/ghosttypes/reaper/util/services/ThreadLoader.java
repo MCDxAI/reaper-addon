@@ -4,7 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-public class TL { // Thread Loader
+public class ThreadLoader {
     public static ExecutorService cached = Executors.newCachedThreadPool();
     public static ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(10);
     public static ExecutorService modules = Executors.newFixedThreadPool(10);

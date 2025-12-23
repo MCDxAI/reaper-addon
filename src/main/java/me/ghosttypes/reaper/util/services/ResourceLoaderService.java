@@ -20,7 +20,7 @@ public class ResourceLoaderService {
     public static ArrayList<String> DEVELOPERS = new ArrayList<>();
 
     public static void init() {
-        TL.cached.execute(() -> {
+        ThreadLoader.cached.execute(() -> {
             String response = Http.get("https://raw.githubusercontent.com/MCDxAI/reaper-addon/main/assets/developer-list.json").sendString();
             if (response != null) {
                 // Manual JSON parsing to avoid GSON dependency for a simple list
@@ -47,7 +47,7 @@ public class ResourceLoaderService {
      */
     public static void bindAssetFromURL(Identifier asset, String url) {
         if (mc.world == null || asset == null || url == null) return;
-        TL.cached.execute(() -> {
+        ThreadLoader.cached.execute(() -> {
             try {
                 var data = NativeImage.read(Http.get(url).sendInputStream());
                 mc.getTextureManager().registerTexture(asset, new NativeImageBackedTexture(() -> asset.toString(), data));
@@ -69,7 +69,7 @@ public class ResourceLoaderService {
     public static void bindAssetFromFile(Identifier asset, String fileName) {
         if (mc.world == null || asset == null || fileName == null) return;
         if (!Reaper.USER_ASSETS.exists()) return;
-        TL.cached.execute(() -> {
+        ThreadLoader.cached.execute(() -> {
             File[] userAssets = Reaper.USER_ASSETS.listFiles();
             if (userAssets == null || userAssets.length < 1) return;
             for (File f : userAssets) {

@@ -1,7 +1,7 @@
 package me.ghosttypes.reaper.util.network;
 
 import me.ghosttypes.reaper.util.player.Interactions;
-import me.ghosttypes.reaper.util.services.TL;
+import me.ghosttypes.reaper.util.services.ThreadLoader;
 import me.ghosttypes.reaper.util.world.CombatHelper;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.Rotations;
@@ -129,7 +129,7 @@ public class PacketManager {
     }
 
     public static void sendInteract(Hand hand, BlockHitResult result, boolean packet) {
-        TL.modules.execute(() -> {
+        ThreadLoader.modules.execute(() -> {
             pendingPlaces.add(result);
             try { Thread.sleep(60); } catch (Exception ignored) {}
             pendingPlaces.remove(result);

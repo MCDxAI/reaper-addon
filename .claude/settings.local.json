@@ -17,7 +17,8 @@
       "Bash(ren:*)",
       "Skill(minecraft-fabric-dev)",
       "mcp__code-search-mcp__search_symbols",
-      "Bash(./gradlew dependencies:*)"
+      "Bash(./gradlew dependencies:*)",
+      "Bash(./gradlew build:*)"
     ]
   }
 }

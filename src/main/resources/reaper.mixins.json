@@ -6,7 +6,8 @@
     "MinecraftClientMixin",
     "HeldItemRendererAccessor",
     "HeldItemRendererMixin",
-    "NotificationProxy"
+    "NotificationProxy",
+    "meteor.FakePlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
