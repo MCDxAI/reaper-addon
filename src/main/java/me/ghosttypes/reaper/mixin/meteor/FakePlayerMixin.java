@@ -27,9 +27,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
@@ -42,6 +42,20 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
  */
 @Mixin(FakePlayer.class)
 public class FakePlayerMixin {
+    // Constants
+    @Unique
+    private static final String FILE_EXTENSION = ".rec";
+    @Unique
+    private static final String TIMESTAMP_FORMAT = "MM.dd.HH.mm.ss";
+    @Unique
+    private static final String CSV_DELIMITER = ",";
+    @Unique
+    private static final int EXPECTED_CSV_FIELDS = 5;
+    @Unique
+    private static final int RECORDING_NAME_MIN_WIDTH = 400;
+    @Unique
+    private static final int HEAD_ROTATION_INTERPOLATION_STEPS = 3;
+
     @Shadow(remap = false)
     @Final
     private SettingGroup sgGeneral;
@@ -51,190 +65,249 @@ public class FakePlayerMixin {
     public Setting<String> name;
 
     @Unique
-    private Setting<Boolean> loop = null;
+    private Setting<Boolean> loopSetting = null;
     @Unique
-    private boolean recording = false;
+    private boolean isRecording = false;
     @Unique
-    private final List<AnglePos> posList = new ArrayList<>();
+    private boolean isPlaying = false;
     @Unique
-    private final List<AnglePos> posList2 = new ArrayList<>();
+    private final List<AnglePos> currentRecording = new ArrayList<>();
     @Unique
-    private boolean playing = false;
+    private final List<AnglePos> originalRecording = new ArrayList<>();
     @Unique
-    private WTextBox b;
+    private WTextBox recordingNameInput;
 
     @Inject(method = "<init>", at = @At("TAIL"), remap = false)
     private void onInit(CallbackInfo ci) {
-        loop = sgGeneral.add(new BoolSetting.Builder().name("loop").description("Whether to loop the recorded movement after playing.").defaultValue(true).build());
+        loopSetting = sgGeneral.add(new BoolSetting.Builder()
+            .name("loop")
+            .description("Whether to loop the recorded movement after playing.")
+            .defaultValue(true)
+            .build());
     }
 
     @Inject(method = "getWidget", at = @At("RETURN"), cancellable = true, remap = false)
     private void onGetWidget(GuiTheme theme, CallbackInfoReturnable<WWidget> info) {
-        WHorizontalList w = theme.horizontalList();
-        WVerticalList l = theme.verticalList(); // setup lists
+        WHorizontalList buttonRow = theme.horizontalList();
+        WVerticalList layout = theme.verticalList();
 
-        WButton start = w.add(theme.button("Start Recording")).widget();
-        WButton stop = w.add(theme.button("Stop Recording")).widget();
-        WButton play = w.add(theme.button("Play Recording")).widget();
-        WButton importrec = w.add(theme.button("Import")).widget();
-        WButton exportrec = w.add(theme.button("Export")).widget();
+        WButton startButton = buttonRow.add(theme.button("Start Recording")).widget();
+        WButton stopButton = buttonRow.add(theme.button("Stop Recording")).widget();
+        WButton playButton = buttonRow.add(theme.button("Play Recording")).widget();
+        WButton importButton = buttonRow.add(theme.button("Import")).widget();
+        WButton exportButton = buttonRow.add(theme.button("Export")).widget();
 
-        play.action = () -> {
-            if (posList.isEmpty() && posList2.isEmpty()) {
-                ChatUtils.error("No recording to play! Record something first.");
-                return;
-            }
-            if (posList.isEmpty() && !posList2.isEmpty()) {
-                posList.addAll(posList2); // Restore from backup for replay
-            }
-            recording = false; // Stop recording if it was active
-            playing = true;
-            ChatUtils.info("Playing recording...");
-        };
-        start.action = () -> {
-            posList.clear();
-            posList2.clear();
-            recording = true;
-            playing = false; // Stop playback when starting to record
-            ChatUtils.info("Recording started...");
-        };
-        stop.action = () -> {
-            recording = false;
-            posList2.addAll(posList); // Backup for looping/replay
-            ChatUtils.info("Recording stopped. (Size: " + posList.size() + ")");
-        };
-        importrec.action = this::importRecording;
-        exportrec.action = () -> {
-            if (posList.isEmpty()) {
-                ChatUtils.error("No recording!");
-            } else {
-                exportRecording(posList);
-            }
-        };
+        playButton.action = this::onPlayRecording;
+        startButton.action = this::onStartRecording;
+        stopButton.action = this::onStopRecording;
+        importButton.action = this::onImportRecording;
+        exportButton.action = this::onExportRecording;
 
-        l.add(info.getReturnValue());
-        l.add(theme.horizontalSeparator()).expandX();
-        l.add(w); // setup input box for recording name
-        WHorizontalList w2 = theme.horizontalList();
-        b = w2.add(theme.textBox("Recording Name")).minWidth(400).expandX().widget();
-        l.add(w2);
-        info.setReturnValue(l);
+        layout.add(info.getReturnValue());
+        layout.add(theme.horizontalSeparator()).expandX();
+        layout.add(buttonRow);
+
+        WHorizontalList inputRow = theme.horizontalList();
+        recordingNameInput = inputRow.add(theme.textBox("Recording Name"))
+            .minWidth(RECORDING_NAME_MIN_WIDTH)
+            .expandX()
+            .widget();
+        layout.add(inputRow);
+
+        info.setReturnValue(layout);
+    }
+
+    @Unique
+    private void onStartRecording() {
+        currentRecording.clear();
+        originalRecording.clear();
+        isRecording = true;
+        isPlaying = false;
+        ChatUtils.info("Recording started...");
+    }
+
+    @Unique
+    private void onStopRecording() {
+        // Stop playback if it's running
+        if (isPlaying) {
+            isPlaying = false;
+            // Restore currentRecording from backup so it's not partially consumed
+            currentRecording.clear();
+            currentRecording.addAll(originalRecording);
+            ChatUtils.info("Playback stopped. (Recording preserved: " + originalRecording.size() + ")");
+            return;
+        }
+
+        // Stop recording and backup
+        if (isRecording) {
+            isRecording = false;
+            originalRecording.clear();
+            originalRecording.addAll(currentRecording);
+            ChatUtils.info("Recording stopped. (Size: " + currentRecording.size() + ")");
+            return;
+        }
+
+        // Neither recording nor playing
+        ChatUtils.warning("Nothing to stop.");
+    }
+
+    @Unique
+    private void onPlayRecording() {
+        if (currentRecording.isEmpty() && originalRecording.isEmpty()) {
+            ChatUtils.error("No recording to play! Record something first.");
+            return;
+        }
+        if (currentRecording.isEmpty() && !originalRecording.isEmpty()) {
+            currentRecording.addAll(originalRecording);
+        }
+        isRecording = false;
+        isPlaying = true;
+        ChatUtils.info("Playing recording...");
+    }
+
+    @Unique
+    private void onImportRecording() {
+        String recordingName = recordingNameInput.get();
+        if (recordingName == null || recordingName.trim().isEmpty()) {
+            ChatUtils.error("Please enter a recording name!");
+            return;
+        }
+
+        ensureRecordingsDirectoryExists();
+
+        File recordingFile = new File(Reaper.RECORDINGS, recordingName + FILE_EXTENSION);
+        if (!recordingFile.exists()) {
+            ChatUtils.error("Recording not found: " + recordingName);
+            return;
+        }
+
+        importRecordingFromFile(recordingFile);
+    }
+
+    @Unique
+    private void onExportRecording() {
+        if (currentRecording.isEmpty()) {
+            ChatUtils.error("No recording to export!");
+            return;
+        }
+        exportRecordingToFile(currentRecording);
     }
 
     @Unique
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        if (recording) {
-            // 1.21.11 API: Construct Vec3d manually from getX(), getY(), getZ()
+        if (isRecording && mc.player != null) {
             Vec3d pos = new Vec3d(mc.player.getX(), mc.player.getY(), mc.player.getZ());
-            posList.add(new AnglePos(pos, mc.player.getYaw(), mc.player.getPitch())); // recording
+            currentRecording.add(new AnglePos(pos, mc.player.getYaw(), mc.player.getPitch()));
         }
-        if (playing) { // playback
-            if (!posList.isEmpty()) {
-                AnglePos angles = posList.remove(0);
+
+        if (isPlaying) {
+            if (!currentRecording.isEmpty()) {
+                AnglePos angles = currentRecording.remove(0);
                 FakePlayerManager.forEach(entity -> {
-                    // 1.21.11 API: updateTrackedPositionAndAngles now takes Vec3d instead of x,y,z
-                    // and removed interpolationSteps and teleport parameters
                     entity.updateTrackedPositionAndAngles(angles.getPos(), angles.getYaw(), angles.getPitch());
-                    entity.updateTrackedHeadRotation(angles.getYaw(), 3);
+                    entity.updateTrackedHeadRotation(angles.getYaw(), HEAD_ROTATION_INTERPOLATION_STEPS);
                 });
             } else {
-                if (!posList2.isEmpty() && loop.get()) posList.addAll(posList2); // loop at the end
-                else playing = false;
-            }
-        }
-    }
-
-    /**
-     * Imports a recording from file.
-     * File format: CSV with yaw,pitch,x,y,z per line
-     *
-     * @author GhostTypes
-     */
-    @Unique
-    private void importRecording() {
-        if (!Reaper.RECORDINGS.exists()) {
-            Reaper.RECORDINGS.mkdirs();
-            ChatUtils.error("You haven't saved any recordings yet!");
-            return;
-        }
-
-        File i = new File(Reaper.RECORDINGS, b.get() + ".rec");
-        if (i.exists()) {
-            try {
-                posList.clear();
-                BufferedReader reader = new BufferedReader(new FileReader(i));
-                String l = reader.readLine();
-                while (l != null) {
-                    try {
-                        String[] data = l.split(","); /* reconstruct angle pos data */
-                        float yaw = Float.parseFloat(data[0]);
-                        float pitch = Float.parseFloat(data[1]);
-                        Vec3d pos = new Vec3d(Double.parseDouble(data[2]), Double.parseDouble(data[3]), Double.parseDouble(data[4]));
-                        posList.add(new AnglePos(pos, yaw, pitch));
-                    } catch (Exception e) {
-                        Reaper.log("Error reading FakePlayer recording.");
-                        e.printStackTrace();
-                        ChatUtils.error("Error reading recording " + i.getName());
-                        posList.clear();
-                        break;
-                    }
-                    l = reader.readLine();
+                if (!originalRecording.isEmpty() && loopSetting.get()) {
+                    currentRecording.addAll(originalRecording);
+                } else {
+                    isPlaying = false;
                 }
-                ChatUtils.info("Imported recording " + i.getName() + "(Size: " + posList.size() + ")");
-            } catch (Exception e) {
-                Reaper.log("Error importing FakePlayer recording.");
-                e.printStackTrace();
-                ChatUtils.error("Error importing recording " + i.getName());
-                posList.clear();
             }
-        } else {
-            ChatUtils.error("Recording not found!");
-            posList.clear();
         }
     }
 
-    /**
-     * Exports a recording to file.
-     * File format: CSV with yaw,pitch,x,y,z per line
-     * Filename: MM.dd.HH.mm.rec (timestamp)
-     *
-     * @author GhostTypes
-     */
     @Unique
-    private void exportRecording(List<AnglePos> recording) {
-        if (!Reaper.RECORDINGS.exists()) Reaper.RECORDINGS.mkdirs();
-
-        SimpleDateFormat tstamp = new SimpleDateFormat("MM.dd.HH.mm"); /* setup output file */
-        String timestamp = tstamp.format(Calendar.getInstance().getTime());
-        File output = new File(Reaper.RECORDINGS, timestamp + ".rec");
-
-        try {
-
-            boolean created = output.createNewFile();
-            if (!created) {
-                ChatUtils.error("Error creating recording file.");
-                return;
+    private void ensureRecordingsDirectoryExists() {
+        if (!Reaper.RECORDINGS.exists()) {
+            if (!Reaper.RECORDINGS.mkdirs()) {
+                Reaper.log("Failed to create recordings directory: " + Reaper.RECORDINGS.getPath());
             }
-
-            BufferedWriter writer = new BufferedWriter(new FileWriter(output.getPath()));
-
-            for (AnglePos ap : recording) { /* store the angle pos list to a file */
-                float yaw = ap.getYaw();
-                float pitch = ap.getPitch();
-                Vec3d pos = ap.getPos();
-                String l = yaw + "," + pitch + "," + pos.x + "," + pos.y + "," + pos.z;
-                writer.write(l + "\n");
-            }
-
-            writer.close();
-            ChatUtils.info("Exported recording " + timestamp + " (Size: " + recording.size() + ")");
-
-        } catch (Exception e) {
-            Reaper.log("Error exporting FakePlayer recording.");
-            e.printStackTrace();
-            ChatUtils.error("Error exporting recording.");
         }
     }
 
+    @Unique
+    private void importRecordingFromFile(File file) {
+        currentRecording.clear();
+        int lineNumber = 0;
+        int skippedLines = 0;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lineNumber++;
+
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] data = line.split(CSV_DELIMITER);
+                if (data.length != EXPECTED_CSV_FIELDS) {
+                    Reaper.log("Skipping malformed line " + lineNumber + ": expected " + EXPECTED_CSV_FIELDS + " fields, got " + data.length);
+                    skippedLines++;
+                    continue;
+                }
+
+                try {
+                    float yaw = Float.parseFloat(data[0]);
+                    float pitch = Float.parseFloat(data[1]);
+                    double x = Double.parseDouble(data[2]);
+                    double y = Double.parseDouble(data[3]);
+                    double z = Double.parseDouble(data[4]);
+                    currentRecording.add(new AnglePos(new Vec3d(x, y, z), yaw, pitch));
+                } catch (NumberFormatException e) {
+                    Reaper.log("Skipping line " + lineNumber + " with invalid number format: " + line);
+                    skippedLines++;
+                }
+            }
+
+            originalRecording.clear();
+            originalRecording.addAll(currentRecording);
+
+            if (skippedLines > 0) {
+                ChatUtils.warning("Imported " + file.getName() + " (Size: " + currentRecording.size() + ", Skipped: " + skippedLines + " malformed lines)");
+            } else {
+                ChatUtils.info("Imported " + file.getName() + " (Size: " + currentRecording.size() + ")");
+            }
+        } catch (IOException e) {
+            Reaper.log("Error reading recording file: " + file.getName());
+            e.printStackTrace();
+            ChatUtils.error("Error reading recording: " + file.getName());
+            currentRecording.clear();
+        }
+    }
+
+    @Unique
+    private void exportRecordingToFile(List<AnglePos> recording) {
+        ensureRecordingsDirectoryExists();
+
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT));
+        File outputFile = new File(Reaper.RECORDINGS, timestamp + FILE_EXTENSION);
+
+        // Handle same-second collision by appending counter
+        int counter = 1;
+        while (outputFile.exists()) {
+            outputFile = new File(Reaper.RECORDINGS, timestamp + "_" + counter + FILE_EXTENSION);
+            counter++;
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
+            for (AnglePos anglePos : recording) {
+                Vec3d pos = anglePos.getPos();
+                writer.write(anglePos.getYaw() + CSV_DELIMITER +
+                            anglePos.getPitch() + CSV_DELIMITER +
+                            pos.x + CSV_DELIMITER +
+                            pos.y + CSV_DELIMITER +
+                            pos.z);
+                writer.newLine();
+            }
+
+            ChatUtils.info("Exported recording: " + outputFile.getName() + " (Size: " + recording.size() + ")");
+        } catch (IOException e) {
+            Reaper.log("Error exporting recording: " + outputFile.getName());
+            e.printStackTrace();
+            ChatUtils.error("Error exporting recording: " + outputFile.getName());
+        }
+    }
 }
